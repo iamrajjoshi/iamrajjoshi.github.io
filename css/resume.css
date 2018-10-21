@@ -60,12 +60,8 @@ p.lead {
     width: 5.5rem;
     background-color: #fffff;
     color: #fff!important;
-    border-radius: 1000%;
-    border-style: solid;
-    border-width: 12px;
-    border-color: white;
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 4.5rem;
     line-height: 3.5rem;
     margin-right: 1rem
 }
