@@ -10,7 +10,7 @@
 
 /**
 *   Glitche (HTML)
-*   Copyright © Glitche by beshleyua. All Rights Reserved.
+*   Copyright © Glitche by beshleyua. Modified by Raj Joshi. All Rights Reserved.
 **/
 
 /* TABLE OF CONTENTS
@@ -21,14 +21,13 @@
   5. Links
   6. Buttons
   7. Preloader
-  8. Forms
-  9. Lists
-  10. Code
-  11. Tables
-  12. Alignment
-  13. Text Formating
-  14. Blockquote
-  15. Animations
+  8. Lists
+  9. Code
+  10. Tables
+  11. Alignment
+  12. Text Formating
+  13. Blockquote
+  14. Animations
 */
 
 /* 1. Basic */
@@ -161,6 +160,7 @@ body.loaded .section {
 /* 3. Columns */
 .cols {
   position: relative;
+  width: 110%;
 }
 
 .cols .col.col-sm {
@@ -189,7 +189,7 @@ body.loaded .section {
 
 .cols .col.col-md {
   float: left;
-  width: 50%;
+  width: 30%;
 }
 
 @media (max-width: 840px) {
@@ -325,145 +325,7 @@ a.btn:hover,
   font-size: 12px;
 }
 
-/* 8. Forms */
-input,
-textarea,
-button {
-  display: block;
-  background: none;
-  font-family: 'Roboto Mono';
-  font-size: 12px;
-  height: 60px;
-  width: 100%;
-  color: #141414;
-  margin-bottom: 30px;
-  padding: 0;
-  border: none;
-  border-bottom: 1px solid #dddddd;
-  -webkit-appearance: none;
-  resize: none;
-  transition: all 0.3s ease 0s;
-  -moz-transition: all 0.3s ease 0s;
-  -webkit-transition: all 0.3s ease 0s;
-  -o-transition: all 0.3s ease 0s;
-  border-radius: 0px;
-  -moz-border-radius: 0px;
-  -webkit-border-radius: 0px;
-  -khtml-border-radius: 0px;
-  outline: 0;
-}
-
-input:focus,
-textarea:focus,
-button:focus {
-  color: #141414;
-  border-bottom: 1px solid #005;
-}
-
-textarea {
-  height: 120px;
-  padding: 0;
-  margin-top: 55px;
-}
-
-button {
-  width: auto;
-  display: inline-block;
-  vertical-align: top;
-  text-align: left;
-  border-bottom: 1px solid #dddddd;
-  cursor: pointer;
-  color: #141414;
-}
-
-button:hover {
-  border-bottom: 1px solid #005;
-}
-
-label,
-legend {
-  display: block;
-  padding-bottom: 10px;
-  font-family: 'Roboto Mono';
-  font-size: 13px;
-}
-
-fieldset {
-  border-width: 0;
-  padding: 0;
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  display: inline;
-}
-
-::-webkit-input-placeholder {
-  color: #999999;
-}
-
-:-moz-placeholder {
-  color: #999999;
-}
-
-::-moz-placeholder {
-  color: #999999;
-}
-
-:-ms-input-placeholder {
-  color: #999999;
-}
-
-input:focus::-webkit-input-placeholder,
-textarea:focus::-webkit-input-placeholder {
-  color: #141414;
-}
-
-input:focus:-moz-placeholder,
-textarea:focus:-moz-placeholder {
-  color: #141414;
-}
-
-input:focus::-moz-placeholder,
-textarea:focus::-moz-placeholder {
-  color: #141414;
-}
-
-input:focus:-ms-input-placeholder,
-textarea:focus:-ms-input-placeholder {
-  color: #141414;
-}
-
-input.error,
-textarea.error {
-  border-bottom: 1px solid red !important;
-}
-
-label.error {
-  display: none!important;
-}
-
-input.error::-moz-placeholder,
-textarea.error::-moz-placeholder {
-  color: red;
-}
-
-input.error:-moz-placeholder,
-textarea.error:-moz-placeholder {
-  color: red;
-}
-
-input.error:-ms-input-placeholder,
-textarea.error:-ms-input-placeholder {
-  color: red;
-}
-
-input.error::-webkit-input-placeholder,
-textarea.error::-webkit-input-placeholder {
-  color: red;
-}
-
-/* 9. Lists */
+/* 8. Lists */
 ol,
 ul {
   list-style: none;
@@ -483,7 +345,7 @@ li {
   margin-bottom: 0px;
 }
 
-/* 10. Code */
+/* 9. Code */
 code {
   background: #dddddd;
   font-size: 16px;
@@ -492,7 +354,7 @@ code {
   padding: 10px 20px;
 }
 
-/* 11. Tables */
+/* 10. Tables */
 table {
   width: 100%;
   margin: 30px 0;
@@ -517,7 +379,7 @@ td {
   color: #363636;
 }
 
-/* 12. Alignment */
+/* 11. Alignment */
 .align-center {
   text-align: center !important;
 }
@@ -564,7 +426,7 @@ td {
   vertical-align: middle !important;
 }
 
-/* 13. Text Formating */
+/* 12. Text Formating */
 .text-uppercase {
   text-transform: uppercase !important;
 }
@@ -589,7 +451,7 @@ td {
   font-style: italic !important;
 }
 
-/* 14. Blockquote */
+/* 13. Blockquote */
 blockquote {
   font-family: 'Roboto Mono';
 }
