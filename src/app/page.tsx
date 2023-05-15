@@ -5,7 +5,20 @@ import { FaEnvelope, FaGithub, FaLinkedin, FaFileAlt } from 'react-icons/fa'
 
 import ColorModeSwitch from '@/components/ColorModeSwitch'
 
+import { useEffect, useState } from 'react'
+
 export default function App() {
+  const [theme, setTheme] = useState<string | null>(null);
+
+    useEffect(() => {
+        let theme = localStorage.getItem('theme') || 'light';
+        setTheme(theme);
+    }, []);
+
+    if (!theme) {
+        return; // `theme` is null in the first render
+    }
+
   return (
     <Center h="100vh">
       <Box position="fixed" top="4" right="4">
