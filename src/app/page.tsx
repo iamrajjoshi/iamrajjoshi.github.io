@@ -29,7 +29,7 @@ export default function App() {
         Hi, I am Raj!
       </Heading>  
       <HStack spacing="4">
-        <Link href="mailto: rajj3@illinois.edu" isExternal>
+        <Link href="mailto: rajjoshi.0222@gmail.com" isExternal>
           <Button leftIcon={<FaEnvelope />} variant="outline">
             Email
           </Button>
