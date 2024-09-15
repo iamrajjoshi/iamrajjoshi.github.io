@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button, Center, Flex, Heading, HStack, Link, VStack, Text } from '@chakra-ui/react'
-import { FaEnvelope, FaGithub, FaLinkedin, FaStrava } from 'react-icons/fa'
+import { FaEnvelope, FaGithub, FaLinkedin, FaStrava, FaXTwitter } from 'react-icons/fa6'
 
 export default function App() {
   const [theme, setTheme] = useState<string | null>(null);
@@ -26,7 +26,8 @@ export default function App() {
           </Heading>
         </Flex>
         <Text fontSize="xl" textAlign="center">
-          hello 👋! i am currently a swe at <Link href="https://www.sentry.io/" isExternal>sentry.io</Link>.
+          👋 hello! i am currently a swe at <Link href="https://www.sentry.io/" isExternal>sentry.io</Link>.
+          if i am not coding, i am probably <Link href="https://xkcd.com/189/" isExternal>running</Link>.
         </Text>
         <HStack spacing="4" flexWrap="wrap" justifyContent="center">
           <Link href="mailto: rajjoshi.0222@gmail.com" isExternal>
@@ -47,6 +48,11 @@ export default function App() {
           <Link href="https://www.strava.com/athletes/rajjoshi" isExternal>
             <Button leftIcon={<FaStrava />} variant="outline">
               Strava
+          </Button>
+          </Link>
+          <Link href="https://x.com/rajjoshi_22" isExternal>
+            <Button leftIcon={<FaXTwitter />} variant="outline">
+              X
           </Button>
           </Link>
         </HStack>
