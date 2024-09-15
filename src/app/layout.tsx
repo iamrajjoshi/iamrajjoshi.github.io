@@ -1,10 +1,6 @@
 'use client'
 
-import { ColorModeScript } from '@chakra-ui/react'
-
 import { Providers } from "./providers";
-
-import theme from '@/app/theme'
 
 export default function RootLayout({
   children,

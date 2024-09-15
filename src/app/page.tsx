@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button, Center, Flex, Heading, HStack, Link, VStack, Text } from '@chakra-ui/react'
-import { FaEnvelope, FaGithub, FaLinkedin, FaFileAlt, FaStrava } from 'react-icons/fa'
+import { FaEnvelope, FaGithub, FaLinkedin, FaStrava } from 'react-icons/fa'
 
 export default function App() {
   const [theme, setTheme] = useState<string | null>(null);
