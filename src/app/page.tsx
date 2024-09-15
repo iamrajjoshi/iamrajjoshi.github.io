@@ -1,21 +1,10 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Button, Center, Flex, Heading, HStack, Link, VStack, Text } from '@chakra-ui/react'
 import { FaEnvelope, FaGithub, FaLinkedin, FaStrava, FaXTwitter } from 'react-icons/fa6'
 
 export default function App() {
-  const [theme, setTheme] = useState<string | null>(null);
-
-  useEffect(() => {
-    let theme = localStorage.getItem('theme') || 'light';
-    setTheme(theme);
-  }, []);
-
-  if (!theme) {
-    return null; // `theme` is null in the first render
-  }
-
   return (
     <Center h="100vh">
       <VStack spacing="6">
