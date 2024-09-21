@@ -19,7 +19,7 @@ export default function App() {
           if i am not coding, i am probably <Link href="https://xkcd.com/189/" isExternal>running</Link>.
         </Text>
         <HStack spacing="4" flexWrap="wrap" justifyContent="center">
-          <Link href="mailto: rajjoshi.0222@gmail.com" isExternal>
+          <Link href="mailto: raj@rajjoshi.me" isExternal>
             <Button leftIcon={<FaEnvelope />} variant="outline">
               Email
             </Button>
