@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Button, Center, Flex, Heading, HStack, Link, VStack, Text } from '@chakra-ui/react'
-import { FaEnvelope, FaGithub, FaLinkedin, FaStrava, FaXTwitter, FaBlogger } from 'react-icons/fa6'
+import { FaEnvelope, FaGithub, FaLinkedin, FaStrava, FaXTwitter, FaBlogger, FaCalendar } from 'react-icons/fa6'
 
 export default function App() {
   return (
@@ -47,6 +47,11 @@ export default function App() {
           <Link href="https://x.com/rajjoshi_22" isExternal>
             <Button leftIcon={<FaXTwitter />} variant="outline">
               X
+            </Button>
+          </Link>
+          <Link href="https://calendly.com/iamrajjoshi/coffee-chat" isExternal>
+            <Button leftIcon={<FaCalendar />} variant="outline">
+              Coffee Chat
             </Button>
           </Link>
         </HStack>
