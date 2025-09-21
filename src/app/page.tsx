@@ -80,11 +80,6 @@ export default function App() {
               X
             </Button>
           </Link>
-          <Link href="https://errors.rajjoshi.me" isExternal>
-            <Button leftIcon={<FaBug />} variant="outline">
-              Sentry Error Generator
-            </Button>
-          </Link>
         </HStack>
       </VStack>
     </Center>
