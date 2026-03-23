@@ -109,12 +109,12 @@ export default function App() {
       <footer className="fixed bottom-0 w-full pb-8">
         <p className="text-center text-xs text-zinc-600">
           <a
-            href="https://github.com/iamrajjoshi/iamrajjoshi.github.io"
+            href={`https://github.com/iamrajjoshi/iamrajjoshi.github.io/commit/${process.env.NEXT_PUBLIC_COMMIT_SHA}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="bio-link hover:text-zinc-400 transition-colors"
+            className="bio-link hover:text-zinc-400 transition-colors font-mono"
           >
-            source code.
+            {process.env.NEXT_PUBLIC_COMMIT_SHA}
           </a>
         </p>
       </footer>
