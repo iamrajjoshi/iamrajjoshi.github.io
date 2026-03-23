@@ -7,77 +7,56 @@ const config: ThemeConfig = {
 
 const colors = {
   brand: {
-    50: '#E6FFFA',
-    100: '#B2F5EA',
-    200: '#81E6D9',
-    300: '#4FD1C5',
-    400: '#38B2AC',
-    500: '#319795',
-    600: '#2C7A7B',
-    700: '#285E61',
-    800: '#234E52',
-    900: '#1D4044',
+    50: '#ecfdf5',
+    100: '#d1fae5',
+    200: '#5eead4',
+    300: '#2dd4bf',
+    400: '#14b8a6',
+    500: '#0d9488',
+    600: '#0f766e',
+    700: '#115e59',
+    800: '#134e4a',
+    900: '#1a3a3a',
   },
   background: {
-    dark: '#121212', // Updated to a darker, more neutral background color
+    dark: '#0a0a0f',
   },
 }
 
 const fonts = {
-  heading: '"Poppins", sans-serif',
-  body: '"Inter", sans-serif',
+  heading: 'var(--font-poppins), "Poppins", sans-serif',
+  body: 'var(--font-inter), "Inter", sans-serif',
 }
 
 const styles = {
   global: {
     body: {
       bg: 'background.dark',
+      color: 'whiteAlpha.900',
     },
   },
 }
 
 const components = {
-  Button: {
-    baseStyle: {
-      fontWeight: 'bold',
-      borderRadius: 'full',
-    },
-    variants: {
-      solid: {
-        bg: 'brand.200',
-        color: 'gray.800',
-        _hover: {
-          bg: 'brand.300',
-        },
-      },
-      outline: {
-        borderColor: 'brand.200',
-        color: 'brand.200',
-        _hover: {
-          bg: 'brand.200',
-          color: 'gray.800',
-        },
-      },
-    },
-  },
   Heading: {
     baseStyle: {
-      fontWeight: 'bold',
-      letterSpacing: 'tight',
+      fontWeight: '700',
+      letterSpacing: '-0.03em',
     },
   },
   Link: {
     baseStyle: {
-      color: 'brand.200',
+      color: 'whiteAlpha.500',
+      transition: 'color 0.2s ease',
       _hover: {
         textDecoration: 'none',
-        color: 'brand.100',
+        color: 'whiteAlpha.900',
       },
     },
   },
 }
 
-const theme = extendTheme({ 
+const theme = extendTheme({
   config,
   colors,
   fonts,
