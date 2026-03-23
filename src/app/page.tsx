@@ -105,6 +105,19 @@ export default function App() {
           </motion.div>
         </div>
       </motion.div>
+
+      <footer className="fixed bottom-0 w-full pb-8">
+        <p className="text-center text-xs text-zinc-600">
+          <a
+            href="https://github.com/iamrajjoshi/iamrajjoshi.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bio-link hover:text-zinc-400 transition-colors"
+          >
+            source code.
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
