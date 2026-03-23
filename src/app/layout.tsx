@@ -1,6 +1,9 @@
 import "./globals.css";
-import { Inter, Poppins } from "next/font/google";
+import { Inter, Poppins, Geist } from "next/font/google";
 import { Providers } from "./providers";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+    <html lang="en" className={cn(inter.variable, poppins.variable, "font-sans", geist.variable)}>
       <head>
         <title>Raj Joshi</title>
         <meta name="description" content="Raj Joshi's personal website." />
