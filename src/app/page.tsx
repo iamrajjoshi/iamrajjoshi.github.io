@@ -42,7 +42,7 @@ export default function App() {
       <motion.div variants={container} initial="hidden" animate="visible">
         <div className="flex flex-col gap-8 items-start max-w-[480px]">
           <motion.div variants={fade}>
-            <p className="text-4xl leading-none">🐙</p>
+            <img src="/octopus.png" alt="pixel art octopus" width={128} height={128} className="rounded-full" />
           </motion.div>
 
           <motion.div variants={fade}>

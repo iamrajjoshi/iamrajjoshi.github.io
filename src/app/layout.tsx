@@ -26,10 +26,7 @@ export default function RootLayout({
         <title>Raj Joshi</title>
         <meta name="description" content="Raj Joshi's personal website." />
         <meta name="theme-color" content="#0a0a0f" />
-        <link
-          rel="icon"
-          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐙</text></svg>"
-        />
+        <link rel="icon" href="/octopus.png" type="image/png" />
         <meta property="og:title" content="Raj Joshi" />
         <meta
           property="og:description"
