@@ -71,7 +71,10 @@ export default function App() {
               >
                 sentry.io
               </a>
-              . if i&apos;m not coding, i&apos;m probably{" "}
+              .
+            </p>
+            <p className="text-lg md:text-xl text-zinc-500 leading-[1.7]">
+              if i&apos;m not coding, i&apos;m probably{" "}
               <a
                 href="https://xkcd.com/189/"
                 target="_blank"
