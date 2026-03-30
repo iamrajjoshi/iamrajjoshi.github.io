@@ -13,8 +13,6 @@ type TypewriterLabelProps = {
 };
 
 const CHAR_STAGGER_MS = 30;
-const CURSOR_LINGER_MS = 1000;
-const CURSOR_BLINK_MS = 800;
 
 function measureCharWidths(text: string, font: string): number[] {
   const canvas = document.createElement("canvas");
@@ -38,12 +36,8 @@ export default function TypewriterLabel({
   const [totalWidth, setTotalWidth] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [visibleCount, setVisibleCount] = useState(0);
-  const [showCursor, setShowCursor] = useState(false);
-  const [cursorVisible, setCursorVisible] = useState(true);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const cursorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cursorBlinkRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const containerRef = useRef<HTMLAnchorElement | null>(null);
 
   const chars = Array.from(label);
@@ -90,16 +84,6 @@ export default function TypewriterLabel({
     setCharWidths(widths);
     setTotalWidth(widths.reduce((sum, w) => sum + w, 0));
   }, [font, label]);
-
-  // Measure cursor width
-  const [cursorWidth, setCursorWidth] = useState(0);
-  useEffect(() => {
-    if (!font) return;
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d")!;
-    ctx.font = font;
-    setCursorWidth(ctx.measureText("|").width);
-  }, [font]);
 
   // Animate visible count on hover change
   useEffect(() => {
@@ -149,51 +133,6 @@ export default function TypewriterLabel({
     };
   }, [hovered, chars.length, reducedMotion]);
 
-  // Cursor logic: show when fully revealed, blink, then fade out
-  useEffect(() => {
-    // Clear previous cursor timers
-    if (cursorTimeoutRef.current !== null) {
-      clearTimeout(cursorTimeoutRef.current);
-      cursorTimeoutRef.current = null;
-    }
-    if (cursorBlinkRef.current !== null) {
-      clearInterval(cursorBlinkRef.current);
-      cursorBlinkRef.current = null;
-    }
-
-    if (hovered && visibleCount === chars.length) {
-      setShowCursor(true);
-      setCursorVisible(true);
-
-      // Blink the cursor
-      cursorBlinkRef.current = setInterval(() => {
-        setCursorVisible((prev) => !prev);
-      }, CURSOR_BLINK_MS / 2);
-
-      // Fade out after linger period
-      cursorTimeoutRef.current = setTimeout(() => {
-        setShowCursor(false);
-        if (cursorBlinkRef.current !== null) {
-          clearInterval(cursorBlinkRef.current);
-          cursorBlinkRef.current = null;
-        }
-      }, CURSOR_LINGER_MS);
-    } else {
-      setShowCursor(false);
-    }
-
-    return () => {
-      if (cursorTimeoutRef.current !== null) {
-        clearTimeout(cursorTimeoutRef.current);
-        cursorTimeoutRef.current = null;
-      }
-      if (cursorBlinkRef.current !== null) {
-        clearInterval(cursorBlinkRef.current);
-        cursorBlinkRef.current = null;
-      }
-    };
-  }, [hovered, visibleCount, chars.length]);
-
   const expanded = hovered || visibleCount > 0;
 
   return (
@@ -211,7 +150,7 @@ export default function TypewriterLabel({
       <span>{children}</span>
       <span
         style={{
-          width: expanded ? totalWidth + (showCursor ? cursorWidth : 0) : 0,
+          width: expanded ? totalWidth : 0,
           overflow: "hidden",
           transition: "width 0.3s ease",
           display: "inline-flex",
@@ -233,9 +172,6 @@ export default function TypewriterLabel({
             {c}
           </span>
         ))}
-        {showCursor && (
-          <span style={{ opacity: cursorVisible ? 1 : 0 }}>|</span>
-        )}
       </span>
     </a>
   );
