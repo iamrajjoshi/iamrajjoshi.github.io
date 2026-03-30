@@ -34,6 +34,19 @@ body::before {
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(94, 234, 212, 0.04) 0%, transparent 60%);
 }
 
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Noise grain */
 body::after {
   content: '';

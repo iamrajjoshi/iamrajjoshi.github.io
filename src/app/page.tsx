@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   FaEnvelope,
   FaGithub,
@@ -10,6 +11,11 @@ import {
 } from "react-icons/fa6";
 import { motion, type Variants } from "framer-motion";
 import type { IconType } from "react-icons";
+
+import AsciiBackground from "@/components/AsciiBackground";
+import DitheredLogo from "@/components/DitheredLogo";
+import TextScramble from "@/components/TextScramble";
+import TypewriterLabel from "@/components/TypewriterLabel";
 
 const container: Variants = {
   hidden: {},
@@ -37,54 +43,86 @@ const links: { label: string; href: string; icon: IconType }[] = [
 ];
 
 export default function App() {
+  const [nameComplete, setNameComplete] = useState(false);
+  const [bioComplete, setBioComplete] = useState(false);
+
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
+      <AsciiBackground />
+
       <motion.div variants={container} initial="hidden" animate="visible">
         <div className="flex flex-col gap-8 items-start max-w-[480px]">
           <motion.div variants={fade}>
-            <img src="/octopus.png" alt="pixel art octopus" width={128} height={128} className="rounded-full" />
+            <DitheredLogo src="/octopus.png" size={150} className="rounded-full" />
           </motion.div>
 
           <motion.div variants={fade}>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold tracking-[-0.03em] text-white leading-[1.1]">
+            <TextScramble
+              as="h1"
+              className="text-4xl md:text-5xl font-heading font-bold tracking-[-0.03em] text-white leading-[1.1]"
+              duration={800}
+              onComplete={() => setNameComplete(true)}
+            >
               raj joshi
-            </h1>
+            </TextScramble>
           </motion.div>
 
           <motion.div variants={fade}>
-            <p className="text-lg md:text-xl text-zinc-500 leading-[1.7]">
-              swe at{" "}
-              <a
-                href="https://www.ziphq.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-300 hover:text-white bio-link transition-colors"
-              >
-                Zip
-              </a>
-              , previously at{" "}
-              <a
-                href="https://www.sentry.io/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-300 hover:text-white bio-link transition-colors"
-              >
-                sentry.io
-              </a>
-              .
-            </p>
-            <p className="text-lg md:text-xl text-zinc-500 leading-[1.7]">
-              if i&apos;m not coding, i&apos;m probably{" "}
-              <a
-                href="https://xkcd.com/189/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-300 hover:text-white bio-link transition-colors"
-              >
-                running
-              </a>
-              .
-            </p>
+            {bioComplete ? (
+              <div>
+                <p className="text-lg md:text-xl text-zinc-500 leading-[1.7]">
+                  swe at{" "}
+                  <a
+                    href="https://www.ziphq.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-300 hover:text-white bio-link transition-colors"
+                  >
+                    Zip
+                  </a>
+                  , previously at{" "}
+                  <a
+                    href="https://www.sentry.io/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-300 hover:text-white bio-link transition-colors"
+                  >
+                    sentry.io
+                  </a>
+                  .
+                </p>
+                <p className="text-lg md:text-xl text-zinc-500 leading-[1.7]">
+                  if i&apos;m not coding, i&apos;m probably{" "}
+                  <a
+                    href="https://xkcd.com/189/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-300 hover:text-white bio-link transition-colors"
+                  >
+                    running
+                  </a>
+                  .
+                </p>
+              </div>
+            ) : (
+              <div>
+                <TextScramble
+                  className="text-lg md:text-xl text-zinc-500 leading-[1.7]"
+                  delay={nameComplete ? 0 : 99999}
+                  duration={1000}
+                >
+                  {"swe at Zip, previously at sentry.io."}
+                </TextScramble>
+                <TextScramble
+                  className="text-lg md:text-xl text-zinc-500 leading-[1.7]"
+                  delay={nameComplete ? 200 : 99999}
+                  duration={1000}
+                  onComplete={() => setBioComplete(true)}
+                >
+                  {"if i'm not coding, i'm probably running."}
+                </TextScramble>
+              </div>
+            )}
           </motion.div>
 
           <motion.div variants={fade}>
@@ -92,16 +130,14 @@ export default function App() {
               {links.map((link) => {
                 const Icon = link.icon;
                 return (
-                  <a
+                  <TypewriterLabel
                     key={link.label}
+                    label={link.label}
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-zinc-600 hover:text-white transition-all hover:-translate-y-px"
-                    aria-label={link.label}
                   >
                     <Icon size={18} />
-                  </a>
+                  </TypewriterLabel>
                 );
               })}
             </div>
