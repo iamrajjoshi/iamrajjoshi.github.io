@@ -39,7 +39,7 @@ const links: { label: string; href: string; icon: IconType }[] = [
   { label: "github", href: "https://www.github.com/iamrajjoshi/", icon: FaGithub },
   { label: "linkedin", href: "https://www.linkedin.com/in/rajjoshi-/", icon: FaLinkedin },
   { label: "strava", href: "https://www.strava.com/athletes/rajjoshi", icon: FaStrava },
-  { label: "x", href: "https://x.com/rajjoshi_22", icon: FaXTwitter },
+  { label: "x", href: "https://x.com/iamrajjoshi_", icon: FaXTwitter },
 ];
 
 export default function App() {
