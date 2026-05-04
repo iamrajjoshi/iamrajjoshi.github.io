@@ -67,6 +67,13 @@ const projects: {
     iconSrc: "/projects/willow.svg",
   },
   {
+    title: "current",
+    description: "daily notes for macOS",
+    descriptionLines: ["daily notes", "for macOS"],
+    href: "https://usecurrent.dev",
+    iconSrc: "/projects/current.png",
+  },
+  {
     title: "curfew",
     description: "local-first terminal curfew for your quiet hours",
     descriptionLines: ["local-first terminal curfew", "for your quiet hours"],
