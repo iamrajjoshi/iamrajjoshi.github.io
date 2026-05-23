@@ -67,6 +67,13 @@ const projects: {
     iconSrc: "/projects/willow.svg",
   },
   {
+    title: "gloss",
+    description: "local diff reviews for coding agents",
+    descriptionLines: ["local diff reviews", "for coding agents"],
+    href: "https://getgloss.dev",
+    iconSrc: "/projects/gloss.svg",
+  },
+  {
     title: "current",
     description: "daily notes for macOS",
     descriptionLines: ["daily notes", "for macOS"],
