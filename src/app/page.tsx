@@ -204,7 +204,7 @@ export default function App() {
               </p>
               <nav
                 aria-label="project showcase"
-                className="flex flex-col gap-3 md:flex-row md:flex-wrap md:justify-start md:items-start md:gap-x-6 md:gap-y-0"
+                className="flex flex-col gap-3 md:flex-row md:flex-wrap md:justify-start md:items-start md:gap-x-3 md:gap-y-0"
               >
                 {projects.map((project) => (
                   <ProjectLink
