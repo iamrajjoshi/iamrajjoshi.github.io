@@ -5,9 +5,7 @@
   --muted: #56534d;
   --link: #0f766e;
   --link-hover: #0b5f59;
-  --willow-light: #5eead4;
   --willow: #2dd4bf;
-  --willow-deep: #14b8a6;
 }
 
 *,
@@ -41,10 +39,6 @@ body {
 
 a {
   color: var(--link);
-}
-
-strong {
-  font-weight: 650;
 }
 
 .site-shell {
@@ -137,32 +131,41 @@ p {
 }
 
 .flow-link {
-  background-image: linear-gradient(
-    90deg,
-    var(--willow-light),
-    var(--willow) 60%,
-    var(--willow-deep)
-  );
-  background-position: 0 calc(100% - 0.04em);
-  background-repeat: no-repeat;
-  background-size: 0 0.12em;
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
   text-decoration: none;
-  text-shadow:
-    0.04em 0 var(--background),
-    -0.04em 0 var(--background),
-    0 0.04em var(--background),
-    0 -0.04em var(--background);
-  transition:
-    background-size 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    color 180ms ease;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+  transition: color 180ms ease;
+}
+
+.flow-link::after {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 100% -0.22em 0);
+  color: transparent;
+  content: attr(data-text) / "";
+  pointer-events: none;
+  text-decoration-color: var(--willow);
+  text-decoration-line: underline;
+  text-decoration-skip-ink: auto;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.08em;
+  transition: clip-path 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+}
+
+.projects .flow-link {
+  font-weight: 650;
 }
 
 .flow-link:hover,
 .flow-link:focus-visible {
-  background-size: 100% 0.12em;
   color: var(--link-hover);
+}
+
+.flow-link:hover::after,
+.flow-link:focus-visible::after {
+  clip-path: inset(0 0 -0.22em 0);
 }
 
 .flow-link:focus-visible {
@@ -186,17 +189,18 @@ p {
 ::selection {
   background: rgb(45 212 191 / 28%);
   color: var(--text);
-  text-shadow: none;
 }
 
 @media (hover: none) {
-  .flow-link {
-    background-size: 100% 0.08em;
+  .flow-link::after {
+    clip-path: inset(0 0 -0.22em 0);
+    text-decoration-thickness: 0.08em;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flow-link {
+  .flow-link,
+  .flow-link::after {
     transition: none;
   }
 }
