@@ -1,6 +1,6 @@
 # rajjoshi.me
 
-Personal website. Built with Next.js, Tailwind CSS, and shadcn/ui.
+Personal website. Plain HTML and CSS with no client-side JavaScript.
 
 ## Development
 
@@ -9,6 +9,14 @@ pnpm install
 pnpm dev
 ```
 
+The preview runs at <http://127.0.0.1:3000>. Build the deployable site or format the source with:
+
+```bash
+pnpm build
+pnpm fmt
+pnpm fmt:check
+```
+
 ## Deploy
 
-Push to `main` — deploys to GitHub Pages via GitHub Actions.
+Push to `main` » GitHub Actions builds the static site and deploys `out/` to GitHub Pages.
