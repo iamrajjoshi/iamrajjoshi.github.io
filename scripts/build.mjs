@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createReadStream } from "node:fs";
-import { copyFile, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -27,7 +27,7 @@ async function build() {
   const commitSha = getCommitSha();
   const replacements = {
     "{{COMMIT_LABEL}}": commitSha ? `View commit ${commitSha} on GitHub` : "View source on GitHub",
-    "{{COMMIT_SHA}}": commitSha ?? "source",
+    "{{COMMIT_SHA}}": commitSha ?? "Source",
     "{{COMMIT_URL}}": commitSha ? `${repositoryUrl}/commit/${commitSha}` : repositoryUrl,
   };
 
@@ -40,12 +40,13 @@ async function build() {
   await mkdir(outputDirectory);
   await Promise.all([
     writeFile(resolve(outputDirectory, "index.html"), html),
-    copyFile(resolve(rootDirectory, "styles.css"), resolve(outputDirectory, "styles.css")),
-    copyFile(resolve(rootDirectory, "theme.js"), resolve(outputDirectory, "theme.js")),
-    copyFile(
-      resolve(rootDirectory, "public/octopus-transparent.png"),
-      resolve(outputDirectory, "octopus-transparent.png"),
+    cp(resolve(rootDirectory, "public"), outputDirectory, { recursive: true }),
+    cp(
+      resolve(rootDirectory, "site-foundation.css"),
+      resolve(outputDirectory, "site-foundation.css"),
     ),
+    cp(resolve(rootDirectory, "styles.css"), resolve(outputDirectory, "styles.css")),
+    cp(resolve(rootDirectory, "theme.js"), resolve(outputDirectory, "theme.js")),
   ]);
 
   console.log(`Built site for ${commitSha ?? "source"} in out/`);
@@ -56,6 +57,7 @@ const contentTypes = new Map([
   [".html", "text/html; charset=utf-8"],
   [".js", "text/javascript; charset=utf-8"],
   [".png", "image/png"],
+  [".woff2", "font/woff2"],
 ]);
 
 function sendNotFound(response) {

@@ -3,8 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#fff9eb" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#28221c" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="theme-color"
+      content="#fff9eb"
+      media="(prefers-color-scheme: light)"
+      data-theme-color="light"
+    />
+    <meta
+      name="theme-color"
+      content="#28221c"
+      media="(prefers-color-scheme: dark)"
+      data-theme-color="dark"
+    />
     <meta name="color-scheme" content="light dark" />
 
     <title>Raj Joshi</title>
@@ -15,6 +25,13 @@
     <link rel="canonical" href="https://rajjoshi.me" />
     <link rel="icon" href="/octopus-transparent.png" type="image/png" />
     <link rel="preload" href="/octopus-transparent.png" as="image" fetchpriority="high" />
+    <link
+      rel="preload"
+      href="/fonts/figtree-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <meta property="og:title" content="Raj Joshi" />
     <meta
@@ -31,43 +48,46 @@
     />
 
     <script src="/theme.js"></script>
+    <link rel="stylesheet" href="/site-foundation.css" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="site-shell">
-      <header class="site-header">
-        <h1>
-          <a class="site-name" href="/" aria-current="page">Raj Joshi</a>
+      <header class="site-masthead">
+        <h1 class="site-brand-heading">
+          <a class="site-brand" href="/" aria-current="page">Raj Joshi</a>
         </h1>
 
-        <div class="site-header-actions">
-          <button
-            class="theme-toggle"
-            type="button"
-            data-theme-toggle
-            aria-label="Switch color mode"
-          >
-            <svg class="theme-toggle-mark" viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M10 2.75a7.25 7.25 0 0 0 0 14.5Z" />
-              <circle cx="10" cy="10" r="7.25" />
-            </svg>
-          </button>
-
+        <div class="site-actions">
           <div class="avatar">
             <img
               class="avatar-image"
               src="/octopus-transparent.png"
-              alt="pixel art octopus"
+              alt="Pixel art octopus"
               width="64"
               height="64"
               decoding="async"
               fetchpriority="high"
             />
           </div>
+
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            role="switch"
+            aria-label="Dark mode"
+            aria-checked="false"
+          >
+            <svg class="theme-toggle-mark" viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M10 2.75a7.25 7.25 0 0 0 0 14.5Z" />
+              <circle cx="10" cy="10" r="7.25" />
+            </svg>
+          </button>
         </div>
       </header>
 
-      <main>
+      <main class="site-main" id="main-content">
         <section class="intro" aria-label="About Raj Joshi">
           <p>
             I'm a Senior Software Engineer at
@@ -108,52 +128,47 @@
 
           <ul>
             <li>
-              <a class="flow-link" data-text="willow" href="https://getwillow.dev">willow</a>
-              <span class="project-description">» git worktree manager for AI agent workflows</span>
+              <a class="flow-link" data-text="Willow" href="https://getwillow.dev">Willow</a>
+              <span class="project-description">» Git worktree manager for AI agent workflows</span>
             </li>
             <li>
-              <a class="flow-link" data-text="gloss" href="https://getgloss.dev">gloss</a>
-              <span class="project-description">» local diff reviews for coding agents</span>
+              <a class="flow-link" data-text="Gloss" href="https://getgloss.dev">Gloss</a>
+              <span class="project-description">» Local diff reviews for coding agents</span>
             </li>
             <li>
-              <a class="flow-link" data-text="inkpath" href="https://www.inkpath.dev">inkpath</a>
+              <a class="flow-link" data-text="Inkpath" href="https://www.inkpath.dev">Inkpath</a>
               <span class="project-description">
-                » static notes and documentation sites from Markdown
+                » Static notes and documentation sites from Markdown
               </span>
             </li>
             <li>
-              <a class="flow-link" data-text="current" href="https://usecurrent.dev">current</a>
-              <span class="project-description">» daily notes for macOS</span>
+              <a class="flow-link" data-text="Current" href="https://usecurrent.dev">Current</a>
+              <span class="project-description">» Daily notes for macOS</span>
             </li>
             <li>
-              <a class="flow-link" data-text="curfew" href="https://github.com/iamrajjoshi/curfew">
-                curfew
+              <a class="flow-link" data-text="Curfew" href="https://github.com/iamrajjoshi/curfew">
+                Curfew
               </a>
               <span class="project-description">
-                » local-first terminal curfew for your quiet hours
+                » Local-first terminal curfew for your quiet hours
               </span>
             </li>
             <li>
               <a
                 class="flow-link"
-                data-text="error generator"
+                data-text="Error Generator"
                 href="https://github.com/getsentry/error-generator"
               >
-                error generator
+                Error Generator
               </a>
-              <span class="project-description">» send sample Sentry errors to your project</span>
+              <span class="project-description">» Send sample Sentry errors to your project</span>
             </li>
           </ul>
         </section>
       </main>
 
       <footer class="site-footer">
-        <a
-          class="flow-link commit-link"
-          data-text="{{COMMIT_SHA}}"
-          href="{{COMMIT_URL}}"
-          aria-label="{{COMMIT_LABEL}}"
-        >
+        <a class="commit-link" href="{{COMMIT_URL}}" aria-label="{{COMMIT_LABEL}}">
           {{COMMIT_SHA}}
         </a>
       </footer>
