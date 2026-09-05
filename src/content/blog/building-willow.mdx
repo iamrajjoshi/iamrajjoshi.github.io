@@ -46,7 +46,7 @@ Every method on the `Git` struct (`BareRepoDir`, `WorktreeRoot`, `DefaultBranch`
 
 The entire tool has 2 direct dependencies:
 
-```
+```text
 require (
     github.com/junegunn/fzf v0.70.0
     github.com/urfave/cli/v3 v3.6.2
@@ -128,7 +128,7 @@ wwn feature-c -b feature-b   # stack on top of feature-b
 
 Now all three branches are checked out at once in their own directories. `ww ls` shows the tree:
 
-```
+```text
 feature-a       ✔ +3/-1
 ├─ feature-b    ✔ +12/-4
    └─ feature-c ✔ +7/-2
@@ -154,7 +154,6 @@ func (s *Stack) Remove(branch string) {
 
 `ww sync` rebases the entire stack in one pass. It topologically sorts the branches so parents are always rebased before children, then walks the list:
 
-
 ```go
 // Resolve rebase target: tracked parent → local branch, untracked → origin/<parent>
 rebaseOnto := parent
@@ -168,7 +167,6 @@ If a parent is tracked in the stack, the child rebases onto the local branch. If
 I can point an agent at `feature-a`, keep working on `feature-c` myself, and when `feature-a` lands and gets merged, `ww sync` rebases the whole stack in one shot.
 
 ## Things I learned along the way
-
 
 **Deleting a worktree is slow.** A big worktree can have hundreds of thousands of files. `os.RemoveAll` takes too long, So instead Willow renames to a trash directory which is instant and then it kicks off `rm -rf` in a background process:
 
@@ -221,7 +219,7 @@ func runPostCheckoutHook(hookPath, wtPath string, u *ui.UI) {
 
 ## Building it with AI
 
-I built almost all of Willow with Claude Code. Not as an experiment, it was just the fastest way to build side projects after work. 
+I built almost all of Willow with Claude Code. Not as an experiment, it was just the fastest way to build side projects after work.
 
 I'd describe what I wanted at the level of "add a `--cd` flag that suppresses UI output and prints the worktree path," and Claude would produce working Go. The fzf embedding, the tmux integration, all of it.
 

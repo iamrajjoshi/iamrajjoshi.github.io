@@ -1,12 +1,10 @@
 ---
-import Layout from "@layouts/Layout.astro";
+import PageTitle from "@components/PageTitle.astro";
 import Pagination from "@components/Pagination.astro";
-import { Image } from "astro:assets";
+import { repo } from "@data/constants";
+import Layout from "@layouts/Layout.astro";
 import type { ImageMetadata } from "astro";
-import { author } from "@data/constants";
-import { Icon } from "astro-icon/components";
-import Toast from "@components/Toast.astro";
-import { repo, username } from "@data/constants";
+import { Image } from "astro:assets";
 
 interface Props {
   title: string;
@@ -30,21 +28,26 @@ const {
   readingTime,
 } = Astro.props;
 
+const meaningfulUpdatedDate =
+  updatedDate && updatedDate.valueOf() !== pubDate.valueOf()
+    ? updatedDate
+    : undefined;
 const ogImage = {
   src: `/image/${url}.png`,
   alt: title,
 };
-
-const githubUrl = `${repo}/tree/main/src/content`;
-
-const fullPubDate = pubDate.toLocaleDateString("en", {
-  dateStyle: "full",
-});
-
-const fullUpdatedDate = updatedDate?.toLocaleDateString("en", {
+const editUrl = `${repo}/blob/main/src/content/blog/${url}.mdx`;
+const displayPubDate = pubDate.toLocaleDateString("en-US", {
   year: "numeric",
-  month: "long",
+  month: "short",
   day: "numeric",
+  timeZone: "UTC",
+});
+const displayUpdatedDate = meaningfulUpdatedDate?.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
 });
 ---
 
@@ -52,164 +55,95 @@ const fullUpdatedDate = updatedDate?.toLocaleDateString("en", {
   title={title}
   description={description}
   ogImage={ogImage}
-  pubDate={updatedDate ?? pubDate}
+  pubDate={pubDate}
+  updatedDate={meaningfulUpdatedDate}
 >
-  <header class="flex flex-col mb-8">
-    <time
-      datetime={pubDate.toISOString()}
-      class="block mb-4 text-sm sm:text-base"
-    >
-      {fullPubDate}
-      <span>
-        <span aria-hidden="true"> •</span>
-        {readingTime}
-      </span>
-    </time>
-    <h1
-      class="text-2xl sm:text-4xl pb-8 font-bold text-zinc-100 font-heading"
-    >
-      {title}
-    </h1>
-    <p class="text-zinc-400 text-sm">
-      <span class="block font-semibold">{author}</span>
-      <a
-        class="text-zinc-50 slide-underline block"
-        href={`https://github.com/${username}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        >{username}
-      </a>
+  <header class="article-header">
+    <PageTitle title={title} variant="article" />
+    <p class="article-meta">
+      <time datetime={pubDate.toISOString()}>{displayPubDate}</time>
+      <span>{readingTime}</span>
+      {
+        displayUpdatedDate && (
+          <span>
+            Updated{" "}
+            <time datetime={meaningfulUpdatedDate?.toISOString()}>
+              {displayUpdatedDate}
+            </time>
+          </span>
+        )
+      }
     </p>
+    <hr class="article-rule" />
     {
       image && (
         <Image
+          class="article-hero"
           src={image}
-          alt={imageAlt}
+          alt={imageAlt ?? ""}
           loading="eager"
-          class="rounded-lg"
           width={1200}
           height={630}
         />
       )
     }
   </header>
-  {
-    updatedDate && (
-      <article class="text-zinc-200 py-2 px-4 mb-6 rounded-md text-sm sm:text-base border border-zinc-500 bg-zinc-600/20">
-        <span class="font-semibold">Last updated: </span>
-        {fullUpdatedDate}
-      </article>
-    )
-  }
-  <article
-    class="prose max-w-none prose-invert prose-code:text-zinc-300 prose-a:text-zinc-300 prose-a:underline prose-a:decoration-zinc-500 hover:prose-a:decoration-zinc-300 prose-a:underline-offset-4 prose-headings:text-zinc-100 prose-headings:font-heading prose-img:rounded-lg"
-  >
+
+  <article class="prose">
     <slot />
-    <hr />
   </article>
-  <ul class="mt-4 flex max-sm:flex-col sm:justify-between gap-2 sm:gap-1">
-    <li title="Copy the link of this article">
-      <button
-        id="copy"
-        class="hover:text-zinc-50 transition-all flex flex-row items-center hover:-translate-y-px"
-      >
-        <Icon name="share" size={16} class="mr-1" />
-        Share this article</button
-      >
-    </li>
-    <li>
-      <a
-        href={`${githubUrl}${Astro.url.pathname.slice(0, -1)}.mdx`}
-        class="hover:text-zinc-50 transition-all flex flex-row sm:justify-start sm:flex-row-reverse items-center hover:-translate-y-px"
-        ><Icon name="edit" size={16} class="sm:ml-1 max-sm:mr-1" />Typo? Edit it
-        here</a
-      >
-    </li>
-  </ul>
-  <Toast
-    icon="share"
-    description="Link copied to clipboard."
-    idList="toast-share"
-  />
-  <Pagination />
+
+  <footer class="article-footer">
+    <ul class="article-actions">
+      <li>
+        <button
+          class="article-action article-share"
+          id="copy-link"
+          type="button"
+        >
+          Copy link
+        </button>
+      </li>
+      <li><a class="article-action" href={editUrl}>Suggest an edit</a></li>
+    </ul>
+    <p
+      class="share-status sr-only"
+      id="share-status"
+      role="status"
+      aria-live="polite"
+    >
+    </p>
+    <Pagination />
+  </footer>
 </Layout>
-<script is:inline async>
-  document.getElementById("copy").addEventListener("click", function () {
-    let copyText = window.location.href;
-    let toastElement = document.getElementById("toast-share");
 
-    navigator.clipboard.writeText(copyText).then(() => {
-      toastElement.classList.remove("!invisible");
-      setTimeout(() => {
-        toastElement.classList.add("!invisible");
-      }, 2500);
-    });
-  });
-</script>
 <script>
-  import mediumZoom from "medium-zoom";
+  const copyButton = document.getElementById("copy-link");
+  const shareStatus = document.getElementById("share-status");
 
-  mediumZoom("img", {
-    margin: 16,
-    background: "#00000095",
-  });
-</script>
-<script>
-  const SCRAMBLE_CHARS = ".:'-~+=*!?|/\\<>{}#@&";
-  const INTERVAL = 40;
+  if (
+    copyButton instanceof HTMLButtonElement &&
+    shareStatus instanceof HTMLElement
+  ) {
+    const idleLabel = copyButton.textContent?.trim() ?? "Copy link";
+    let resetLabelTimer: number | undefined;
 
-  function scrambleHeading(el: HTMLElement) {
-    const original = el.textContent || "";
-    if (!original.trim()) return;
-
-    const chars = Array.from(original);
-    const display = [...chars];
-    const resolved = chars.map((c) => c === " ");
-    const duration = 600;
-    const start = performance.now();
-
-    // Show scrambled immediately
-    for (let i = 0; i < display.length; i++) {
-      if (!resolved[i]) display[i] = SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-    }
-    el.textContent = display.join("");
-
-    const timer = setInterval(() => {
-      const elapsed = performance.now() - start;
-      let allDone = true;
-
-      for (let i = 0; i < chars.length; i++) {
-        if (resolved[i]) continue;
-        const resolveAt = (i / chars.length) * duration;
-        if (elapsed >= resolveAt) {
-          display[i] = chars[i];
-          resolved[i] = true;
-        } else {
-          display[i] = SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-          allDone = false;
-        }
+    copyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        copyButton.textContent = "Copied";
+        shareStatus.textContent = "Link copied.";
+      } catch {
+        copyButton.textContent = "Try again";
+        shareStatus.textContent =
+          "Couldn’t copy the link. Use the address bar instead.";
       }
 
-      el.textContent = display.join("");
-
-      if (allDone) clearInterval(timer);
-    }, INTERVAL);
-  }
-
-  // Scramble h2/h3 headings when they scroll into view
-  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    const headings = document.querySelectorAll("article h2, article h3");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            scrambleHeading(entry.target as HTMLElement);
-            observer.unobserve(entry.target);
-          }
-        }
-      },
-      { threshold: 0.5 },
-    );
-    headings.forEach((h) => observer.observe(h));
+      window.clearTimeout(resetLabelTimer);
+      resetLabelTimer = window.setTimeout(() => {
+        copyButton.textContent = idleLabel;
+        shareStatus.textContent = "";
+      }, 2600);
+    });
   }
 </script>

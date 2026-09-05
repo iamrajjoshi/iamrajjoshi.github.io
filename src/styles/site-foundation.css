@@ -1,0 +1,315 @@
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/figtree-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Figtree";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/figtree-latin-400-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("/fonts/figtree-latin-600-normal.woff2") format("woff2");
+}
+
+:root {
+  color-scheme: light dark;
+  --paper: #fff9eb;
+  --ink: #28221c;
+  --background: var(--paper);
+  --text: var(--ink);
+  --muted: #56534d;
+  --faint: #756f67;
+  --link: #0f766e;
+  --link-hover: #0b5f59;
+  --focus: var(--link);
+  --marker: var(--faint);
+  --accent: #2dd4bf;
+  --selection: rgb(45 212 191 / 28%);
+  --toggle-turn: 0deg;
+  --font-sans: "Figtree", system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "Cascadia Code", "Roboto Mono", Consolas,
+    "Liberation Mono", Menlo, monospace;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-body: clamp(1.0625rem, 0.35vw + 0.98rem, 1.1875rem);
+  --text-brand: 1.45em;
+  --text-section: 1.1em;
+  --page-width: 42rem;
+  --page-gutter: 1.25rem;
+  --page-padding-top: 4rem;
+  --page-padding-bottom: 2rem;
+  --masthead-height: 5rem;
+  --content-gap: 3rem;
+  --footer-gap: clamp(4.5rem, 12vw, 7rem);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --background: var(--paper);
+  --text: var(--ink);
+  --muted: #56534d;
+  --faint: #756f67;
+  --link: #0f766e;
+  --link-hover: #0b5f59;
+  --focus: var(--link);
+  --marker: var(--faint);
+  --selection: rgb(45 212 191 / 28%);
+  --toggle-turn: 0deg;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: var(--ink);
+  --text: var(--paper);
+  --muted: #b9ad9a;
+  --faint: #9a8f80;
+  --link: #67c7ba;
+  --link-hover: #83d4ca;
+  --focus: var(--link);
+  --marker: var(--faint);
+  --selection: rgb(45 212 191 / 24%);
+  --toggle-turn: 180deg;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --background: var(--ink);
+    --text: var(--paper);
+    --muted: #b9ad9a;
+    --faint: #9a8f80;
+    --link: #67c7ba;
+    --link-hover: #83d4ca;
+    --focus: var(--link);
+    --marker: var(--faint);
+    --selection: rgb(45 212 191 / 24%);
+    --toggle-turn: 180deg;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 20rem;
+  background: var(--background);
+  font-family: var(--font-sans);
+  font-size: 100%;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='.7'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  content: "";
+  opacity: 0.018;
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] body::before {
+  filter: invert(1);
+  opacity: 0.012;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) body::before {
+    filter: invert(1);
+    opacity: 0.012;
+  }
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--text);
+}
+
+a {
+  color: var(--link);
+}
+
+button,
+input {
+  color: inherit;
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  border-radius: 0.125rem;
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.site-shell {
+  display: flex;
+  width: min(var(--page-width), calc(100% - 2 * var(--page-gutter)));
+  min-height: 100svh;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: var(--page-padding-top) 0 var(--page-padding-bottom);
+}
+
+.site-masthead {
+  display: flex;
+  min-height: var(--masthead-height);
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.site-brand-heading {
+  flex: 0 0 auto;
+  margin: 0;
+  font: inherit;
+}
+
+.site-brand {
+  display: block;
+  flex: 0 0 auto;
+  color: var(--text);
+  font-size: var(--text-brand);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.site-brand:hover {
+  color: var(--link-hover);
+}
+
+.site-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.theme-toggle {
+  display: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  place-items: center;
+}
+
+.js .theme-toggle {
+  display: grid;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--link-hover);
+}
+
+.theme-toggle:focus-visible {
+  outline-offset: 0.15rem;
+}
+
+.theme-toggle-mark {
+  width: 1.0625rem;
+  height: 1.0625rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.5;
+  transform: rotate(var(--toggle-turn));
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.theme-toggle-mark path {
+  fill: currentcolor;
+  stroke: none;
+}
+
+.site-main {
+  margin-top: var(--content-gap);
+}
+
+.site-footer {
+  margin-top: auto;
+  padding-top: var(--footer-gap);
+  color: var(--faint);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.commit-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  text-decoration: none;
+}
+
+.commit-link:hover {
+  color: var(--link-hover);
+}
+
+@media (max-width: 30em) {
+  :root {
+    --page-padding-top: 2.75rem;
+    --content-gap: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .theme-toggle-mark {
+    transition: none;
+  }
+}

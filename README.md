@@ -1,19 +1,22 @@
 # blog
 
-my blog
-
-based on [astrozinc](https://github.com/exylons/astrozinc)
+Raj Joshi’s personal blog, built as a static Astro site.
 
 ## Dev Commands
 
 ```bash
-
 # Install dependencies
 pnpm install
 
 # Start the dev server
 pnpm dev
-
 ```
 
-[![Built with Astro](https://astro.badg.es/v2/built-with-astro/medium.svg)](https://astro.build)
+Posts live in `src/content/blog` and support MDX, local images, footnotes, and
+syntax-highlighted code blocks.
+
+## Visual foundation
+
+The shell, theme behavior, and Figtree files live locally in this repository.
+They intentionally match the personal site, but each site builds and deploys
+independently with no cross-repository revision pin or runtime dependency.

@@ -1,13 +1,12 @@
 ---
-import Link from "@components/Link.astro";
-import AsciiBackground from "@components/AsciiBackground";
+import ThemeToggle from "@components/ThemeToggle.astro";
 import { author, defaultMeta, navigation, repo } from "@data/constants";
-import "@fontsource-variable/inter";
-import "@fontsource/poppins/600.css";
-import "@fontsource/poppins/700.css";
-import Callout from "@components/MDX/Callout.astro";
+import "@styles/site-foundation.css";
+import "@styles/global.css";
+import { execFileSync } from "node:child_process";
 
 interface Props {
+  home?: boolean;
   title?: string;
   description?: string;
   ogImage?: {
@@ -15,47 +14,93 @@ interface Props {
     alt: string;
   };
   pubDate?: Date;
-  wide?: boolean;
+  updatedDate?: Date | undefined;
+  noindex?: boolean;
 }
 
 const {
+  home = false,
   title = defaultMeta.title,
   description = defaultMeta.description,
   ogImage = defaultMeta.ogImage,
   pubDate,
-  wide = false,
+  updatedDate,
+  noindex = false,
 } = Astro.props;
 
-const ogImageURL = new URL(ogImage.src, Astro.site).href;
 const canonicalURL = new URL(Astro.url).href;
+const ogImageURL = new URL(ogImage.src, Astro.site).href;
+const documentTitle =
+  title === defaultMeta.title ? title : `${title} — ${defaultMeta.title}`;
+const isArticle = Boolean(pubDate);
+
+function getCommitSha() {
+  try {
+    const sha = execFileSync("git", ["rev-parse", "--short", "HEAD"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+
+    return /^[0-9a-f]+$/i.test(sha) ? sha : null;
+  } catch {
+    return null;
+  }
+}
+
+const commitSha = getCommitSha();
+const commitLabel = commitSha
+  ? `View commit ${commitSha} on GitHub`
+  : "View source on GitHub";
+const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
 ---
 
 <!doctype html>
-<html lang="en-US" class="dark [color-scheme:dark] scroll-smooth">
+<html lang="en-US">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{documentTitle}</title>
     <link rel="icon" href="/favicon.png" type="image/png" />
     <link rel="canonical" href={canonicalURL} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={defaultMeta.title}
+      href="/rss.xml"
+    />
     <meta name="title" content={title} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0a0a0f" />
-    <meta property="og:type" content="website" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content="#fff9eb"
+      media="(prefers-color-scheme: light)"
+      data-theme-color="light"
+    />
+    <meta
+      name="theme-color"
+      content="#28221c"
+      media="(prefers-color-scheme: dark)"
+      data-theme-color="dark"
+    />
+    <meta property="og:type" content={isArticle ? "article" : "website"} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageURL} />
-    <meta property="og:site_name" content={author} />
+    <meta property="og:site_name" content={defaultMeta.title} />
     <meta property="og:image:alt" content={ogImage.alt} />
     <meta property="og:locale" content="en_US" />
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={ogImageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="robots" content="follow, index" />
+    <meta
+      name="robots"
+      content={noindex ? "noindex, follow" : "index, follow"}
+    />
     <meta name="author" content={author} />
     {
       pubDate && (
@@ -65,110 +110,61 @@ const canonicalURL = new URL(Astro.url).href;
         />
       )
     }
+    {
+      updatedDate && (
+        <meta
+          property="article:modified_time"
+          content={updatedDate.toISOString()}
+        />
+      )
+    }
+    <script is:inline src="/theme.js"></script>
   </head>
-  <body
-    class="bg-[#0a0a0f] antialiased selection:bg-teal-500/25 selection:text-white pt-10 2xl:text-lg"
-  >
-    <AsciiBackground client:load />
-    <a
-      href="#main-content"
-      class="absolute opacity-0 focus:opacity-100 border-transparent border-y border-r text-xs lg:text-sm px-4 py-1.5 lg:py-2 top-1 lg:top-[41px] transition-transform duration-300 rounded-r-full bg-zinc-800 font-medium text-zinc-200 -translate-x-full focus:translate-x-0 focus:ring"
-      >Skip to main content</a
-    >
-    <nav
-      class="mb-16 mx-auto flex overflow-x-auto px-6 lg:px-2 sm:overflow-x-visible justify-between"
-      class:list={{
-        "max-w-4xl": wide,
-        "max-w-3xl": !wide,
-      }}
-    >
-      <ul class="flex justify-evenly space-x-6">
-        {
-          navigation.map((item) => (
-            <li>
-              <Link {...item} />
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-    <main
-      class="px-6 lg:px-2 mx-auto text-zinc-400"
-      id="main-content"
-      class:list={{
-        "max-w-4xl": wide,
-        "max-w-3xl": !wide,
-      }}
-    >
-      <noscript>
-        <Callout type="error" title="NOTICE">
-          Some features on this website won't work without JavaScript such as
-          search bar and copy article.
-        </Callout>
-      </noscript>
-      <slot />
-    </main>
-    <footer class="mt-12 pb-12">
-      <div
-        class="mx-auto max-w-4xl px-6 lg:px-2 text-center text-xs lg:text-sm text-zinc-400"
-      >
-        <p>
-          <a href={repo} class="slide-underline z-10">source code.</a>
-        </p>
-      </div>
-    </footer>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="site-shell">
+      <header class="site-header">
+        <nav class="site-masthead" aria-label="Primary navigation">
+          {
+            home ? (
+              <h1 class="site-brand-heading">
+                <a class="site-brand" href="/" aria-current="page">
+                  Raj Joshi
+                </a>
+              </h1>
+            ) : (
+              <a class="site-brand" href="/" aria-label="Raj Joshi — blog home">
+                Raj Joshi
+              </a>
+            )
+          }
+          <ul class="site-actions">
+            {
+              navigation.map((item) => (
+                <li>
+                  <a
+                    class="site-nav-link"
+                    href={item.href}
+                    aria-label={item.ariaLabel}
+                    rel={item.rel}
+                  >
+                    {item.text}
+                  </a>
+                </li>
+              ))
+            }
+            <li><ThemeToggle /></li>
+          </ul>
+        </nav>
+      </header>
+      <main class="site-main" id="main-content">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <a class="commit-link" href={commitUrl} aria-label={commitLabel}>
+          {commitSha ?? "Source"}
+        </a>
+      </footer>
+    </div>
   </body>
 </html>
-
-<style is:global>
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(94, 234, 212, 0.04) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    opacity: 0.025;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 256px 256px;
-  }
-
-  body::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  body::-webkit-scrollbar-thumb {
-    @apply bg-zinc-800;
-  }
-
-  /* Sliding underline on hover */
-  .slide-underline {
-    position: relative;
-    text-decoration: none;
-  }
-
-  .slide-underline::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: currentColor;
-    transition: width 0.25s ease;
-  }
-
-  .slide-underline:hover::after {
-    width: 100%;
-  }
-</style>
