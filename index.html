@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#fff9eb" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#fff9eb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#28221c" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
 
     <title>Raj Joshi</title>
     <meta
@@ -29,27 +30,40 @@
       content="Senior Software Engineer at Zip, previously at Sentry. Building useful tools for developers."
     />
 
+    <script src="/theme.js"></script>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="site-shell">
       <header class="site-header">
         <h1>
-          <a class="flow-link site-name" data-text="Raj Joshi" href="/" aria-current="page">
-            Raj Joshi
-          </a>
+          <a class="site-name" href="/" aria-current="page">Raj Joshi</a>
         </h1>
 
-        <div class="avatar">
-          <img
-            class="avatar-image"
-            src="/octopus-transparent.png"
-            alt="pixel art octopus"
-            width="64"
-            height="64"
-            decoding="async"
-            fetchpriority="high"
-          />
+        <div class="site-header-actions">
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Switch color mode"
+          >
+            <svg class="theme-toggle-mark" viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M10 2.75a7.25 7.25 0 0 0 0 14.5Z" />
+              <circle cx="10" cy="10" r="7.25" />
+            </svg>
+          </button>
+
+          <div class="avatar">
+            <img
+              class="avatar-image"
+              src="/octopus-transparent.png"
+              alt="pixel art octopus"
+              width="64"
+              height="64"
+              decoding="async"
+              fetchpriority="high"
+            />
+          </div>
         </div>
       </header>
 

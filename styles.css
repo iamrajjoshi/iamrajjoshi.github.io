@@ -1,11 +1,49 @@
 :root {
-  color-scheme: light;
-  --background: #fff9eb;
-  --text: #171513;
+  color-scheme: light dark;
+  --paper: #fff9eb;
+  --ink: #28221c;
+  --background: var(--paper);
+  --text: var(--ink);
   --muted: #56534d;
   --link: #0f766e;
   --link-hover: #0b5f59;
+  --marker: #87847d;
+  --toggle-turn: 0deg;
   --willow: #2dd4bf;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--ink);
+    --text: var(--paper);
+    --muted: #b9ad9a;
+    --link: #67c7ba;
+    --link-hover: #83d4ca;
+    --marker: #81776a;
+    --toggle-turn: 180deg;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --background: var(--paper);
+  --text: var(--ink);
+  --muted: #56534d;
+  --link: #0f766e;
+  --link-hover: #0b5f59;
+  --marker: #87847d;
+  --toggle-turn: 0deg;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: var(--ink);
+  --text: var(--paper);
+  --muted: #b9ad9a;
+  --link: #67c7ba;
+  --link-hover: #83d4ca;
+  --marker: #81776a;
+  --toggle-turn: 180deg;
 }
 
 *,
@@ -42,6 +80,7 @@ a {
 }
 
 .site-shell {
+  position: relative;
   width: min(36em, calc(100% - 2.5rem));
   margin: 0 auto;
   padding: 4rem 0 8rem;
@@ -63,6 +102,62 @@ a {
 
 .site-name {
   color: var(--text);
+  text-decoration: none;
+}
+
+.site-name:focus-visible {
+  border-radius: 0.08em;
+  outline: 2px solid var(--link-hover);
+  outline-offset: 0.22em;
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 0.625rem;
+  right: 0;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  place-items: center;
+  transition: color 180ms ease;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--link-hover);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--link-hover);
+  outline-offset: 0.15rem;
+}
+
+.theme-toggle-mark {
+  width: 1.0625rem;
+  height: 1.0625rem;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.5;
+  transform: rotate(var(--toggle-turn));
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.theme-toggle-mark path {
+  fill: currentcolor;
+  stroke: none;
 }
 
 .avatar {
@@ -123,7 +218,7 @@ p {
 }
 
 .projects li::marker {
-  color: #87847d;
+  color: var(--marker);
 }
 
 .project-description {
@@ -200,7 +295,9 @@ p {
 
 @media (prefers-reduced-motion: reduce) {
   .flow-link,
-  .flow-link::after {
+  .flow-link::after,
+  .theme-toggle,
+  .theme-toggle-mark {
     transition: none;
   }
 }
@@ -212,6 +309,10 @@ p {
 
   .site-shell {
     padding: 2.75rem 0 5rem;
+  }
+
+  .theme-toggle {
+    top: 0;
   }
 
   main {

@@ -41,6 +41,7 @@ async function build() {
   await Promise.all([
     writeFile(resolve(outputDirectory, "index.html"), html),
     copyFile(resolve(rootDirectory, "styles.css"), resolve(outputDirectory, "styles.css")),
+    copyFile(resolve(rootDirectory, "theme.js"), resolve(outputDirectory, "theme.js")),
     copyFile(
       resolve(rootDirectory, "public/octopus-transparent.png"),
       resolve(outputDirectory, "octopus-transparent.png"),
@@ -53,6 +54,7 @@ async function build() {
 const contentTypes = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
+  [".js", "text/javascript; charset=utf-8"],
   [".png", "image/png"],
 ]);
 

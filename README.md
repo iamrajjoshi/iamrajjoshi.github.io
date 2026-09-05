@@ -1,6 +1,6 @@
 # rajjoshi.me
 
-Personal website. Plain HTML and CSS with no client-side JavaScript.
+Personal website. Plain HTML and CSS with a small JavaScript theme switcher.
 
 ## Development
 
