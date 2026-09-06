@@ -34,6 +34,4 @@ Pushing to `main` runs the GitHub Pages workflow and deploys the generated
 
 ## Licenses
 
-The blog began from Lance Ross’s Astro blog template. Its MIT license is
-preserved in `LICENSES/blog-template-MIT.txt`. Figtree’s Open Font License is
-preserved in `public/fonts/OFL.txt`.
+Figtree’s Open Font License is preserved in `public/fonts/OFL.txt`.
