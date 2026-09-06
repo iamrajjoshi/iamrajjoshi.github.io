@@ -1,10 +1,17 @@
 # rajjoshi.me
 
-Personal website. Plain HTML and CSS with a small JavaScript theme switcher.
+Raj Joshi’s personal website and blog, built as one static Astro site.
 
-The reusable visual primitives live in `site-foundation.css`, `theme.js`, and
-`public/fonts/`. The blog keeps matching local equivalents so both sites can
-build and deploy independently.
+## Routes
+
+- `/` — personal site and selected work
+- `/blog/` — writing index
+- `/blog/<slug>/` — articles
+- `/rss.xml` — RSS feed
+
+Posts live in `src/content/blog` and support MDX, local images, footnotes, and
+syntax-highlighted code blocks. The personal site and blog share one layout,
+theme switcher, type scale, and visual foundation.
 
 ## Development
 
@@ -13,14 +20,20 @@ pnpm install
 pnpm dev
 ```
 
-The preview runs at <http://127.0.0.1:3000>. Build the deployable site or format the source with:
+The preview runs at <http://127.0.0.1:4321>. Validate and build the site with:
 
 ```bash
+pnpm lint
 pnpm build
-pnpm fmt
-pnpm fmt:check
 ```
 
 ## Deploy
 
-Push to `main` » GitHub Actions builds the static site and deploys `out/` to GitHub Pages.
+Pushing to `main` runs the GitHub Pages workflow and deploys the generated
+`dist/` directory to <https://rajjoshi.me>.
+
+## Licenses
+
+The blog began from Lance Ross’s Astro blog template. Its MIT license is
+preserved in `LICENSES/blog-template-MIT.txt`. Figtree’s Open Font License is
+preserved in `public/fonts/OFL.txt`.

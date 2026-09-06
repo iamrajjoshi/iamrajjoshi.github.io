@@ -1,0 +1,134 @@
+---
+import { getCollection } from "astro:content";
+
+import Layout from "@layouts/Layout.astro";
+
+const projects = [
+  {
+    name: "Willow",
+    href: "https://getwillow.dev",
+    description: "Git worktree manager for AI agent workflows",
+  },
+  {
+    name: "Gloss",
+    href: "https://getgloss.dev",
+    description: "Local diff reviews for coding agents",
+  },
+  {
+    name: "Inkpath",
+    href: "https://www.inkpath.dev",
+    description: "Static notes and documentation sites from Markdown",
+  },
+  {
+    name: "Current",
+    href: "https://usecurrent.dev",
+    description: "Daily notes for macOS",
+  },
+  {
+    name: "Curfew",
+    href: "https://github.com/iamrajjoshi/curfew",
+    description: "Local-first terminal curfew for your quiet hours",
+  },
+  {
+    name: "Error Generator",
+    href: "https://github.com/getsentry/error-generator",
+    description: "Send sample Sentry errors to your project",
+  },
+];
+
+const writing = (await getCollection("blog"))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3)
+  .map((post) => ({
+    title: post.data.homeTitle ?? post.data.title,
+    href: `/blog/${post.id}/`,
+    description: post.data.homeDescription ?? post.data.description,
+  }));
+---
+
+<Layout section="home">
+  <section class="intro" aria-label="About Raj Joshi">
+    <p>
+      I’m a Senior Software Engineer building AI systems and developer tools. At{
+        " "
+      }
+      <a class="flow-link" data-text="Zip" href="https://zip.com/">Zip</a>, I
+      work on agent systems, sandboxes, and data pipelines that power
+      procurement agents. Before that, I built notification and alerting systems
+      at{" "}
+      <a class="flow-link" data-text="Sentry" href="https://sentry.io/"
+        >Sentry</a
+      >. I studied computer science at UIUC.
+    </p>
+
+    <p>
+      Outside work, I’m probably{" "}
+      <a class="flow-link" data-text="running" href="https://xkcd.com/189/"
+        >running</a
+      >. Find me on{" "}
+      <a
+        class="flow-link"
+        data-text="GitHub"
+        href="https://github.com/iamrajjoshi/">GitHub</a
+      >,{" "}
+      <a
+        class="flow-link"
+        data-text="LinkedIn"
+        href="https://www.linkedin.com/in/rajjoshi-/">LinkedIn</a
+      >,{" "}
+      <a
+        class="flow-link"
+        data-text="Strava"
+        href="https://www.strava.com/athletes/rajjoshi">Strava</a
+      >, or <a class="flow-link" data-text="X" href="https://x.com/iamrajjoshi_"
+        >X</a
+      >; read my{" "}
+      <a class="flow-link" data-text="notes" href="https://notes.rajjoshi.me"
+        >notes</a
+      > and{" "}
+      <a class="flow-link" data-text="clip file" href="https://clip.rajjoshi.me"
+        >clip file</a
+      >; or{" "}
+      <a
+        class="flow-link"
+        data-text="send me an email"
+        href="mailto:raj@rajjoshi.me">send me an email</a
+      >.
+    </p>
+  </section>
+
+  <section class="link-list projects" aria-labelledby="projects-heading">
+    <h2 id="projects-heading">Things I have built</h2>
+    <ul>
+      {
+        projects.map((project) => (
+          <li>
+            <a class="flow-link" data-text={project.name} href={project.href}>
+              {project.name}
+            </a>{" "}
+            <span class="list-description">» {project.description}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="link-list writing" aria-labelledby="writing-heading">
+    <div class="section-heading-row">
+      <h2 id="writing-heading">Recent writing</h2>
+      <a class="section-link" href="/blog/">All writing</a>
+    </div>
+    <ul>
+      {
+        writing.map((post) => (
+          <li>
+            <a class="flow-link" data-text={post.title} href={post.href}>
+              {post.title}
+            </a>{" "}
+            <span class="list-description">» {post.description}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Layout>

@@ -1,0 +1,47 @@
+export const author = "Raj Joshi";
+
+export const repo = "https://github.com/iamrajjoshi/iamrajjoshi.github.io";
+
+export const defaultMeta = {
+  title: "Raj Joshi",
+  description:
+    "Software engineer building AI systems and developer tools. Selected work and writing by Raj Joshi.",
+  ogImage: {
+    src: "/image/site.png",
+    alt: "Raj Joshi",
+  },
+};
+
+export const blogMeta = {
+  title: "Raj’s blog",
+  description:
+    "I’m Raj, a software engineer working on AI systems and developer tools. These are notes from things I’ve built or had to figure out.",
+  ogImage: {
+    src: "/image/blog.png",
+    alt: "Raj’s blog",
+  },
+};
+
+export const homeNavigation = [
+  {
+    href: "/blog/",
+    text: "Blog",
+    ariaLabel: "Read Raj Joshi’s blog",
+    rel: undefined,
+  },
+];
+
+export const blogNavigation = [
+  {
+    href: "/",
+    text: "About",
+    ariaLabel: "About Raj Joshi",
+    rel: "author",
+  },
+  {
+    href: "/rss.xml",
+    text: "RSS",
+    ariaLabel: "RSS feed",
+    rel: undefined,
+  },
+];

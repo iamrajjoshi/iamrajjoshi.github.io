@@ -1,0 +1,23 @@
+---
+import Blog from "@components/Blog.astro";
+import { blogMeta } from "@data/constants";
+import Layout from "@layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<Layout
+  section="blog"
+  title={blogMeta.title}
+  description={blogMeta.description}
+  ogImage={blogMeta.ogImage}
+>
+  <section aria-label="Articles">
+    <ul class="post-list post-list--home">
+      {posts.map((post) => <Blog {...post} />)}
+    </ul>
+  </section>
+</Layout>
