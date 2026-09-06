@@ -42,10 +42,11 @@
     ui-monospace, SFMono-Regular, "Cascadia Code", "Roboto Mono", Consolas, "Liberation Mono",
     Menlo, monospace;
   --text-xs: 0.8125rem;
+  --text-nav: 0.875rem;
   --text-sm: 0.9375rem;
   --text-base: 1.0625rem;
   --text-body: clamp(1.0625rem, 0.35vw + 0.98rem, 1.1875rem);
-  --text-brand: 1.45em;
+  --text-brand: 1.5em;
   --text-section: 1.1em;
   --page-width: 42rem;
   --page-gutter: 1.25rem;
@@ -256,8 +257,8 @@ button {
 }
 
 .theme-toggle-mark {
-  width: 1.0625rem;
-  height: 1.0625rem;
+  width: 1.125rem;
+  height: 1.125rem;
   fill: none;
   stroke: currentcolor;
   stroke-width: 1.5;

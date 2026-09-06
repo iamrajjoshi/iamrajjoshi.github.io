@@ -1,17 +1,40 @@
+.site-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .avatar {
   display: grid;
-  width: 5rem;
-  height: 5rem;
-  flex: 0 0 5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex: 0 0 3.5rem;
   place-items: center;
 }
 
 .avatar-image {
   display: block;
-  width: 4.5rem;
-  height: 4.5rem;
-  transform: scale(1.35);
+  width: 3.5rem;
+  height: 3.5rem;
+  image-rendering: pixelated;
+  transform: scale(1.2);
   transform-origin: center;
+}
+
+.site-nav-link {
+  display: grid;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding-inline: 0.35rem;
+  color: var(--muted);
+  font-size: var(--text-nav);
+  font-weight: 600;
+  text-decoration: none;
+  place-items: center;
+}
+
+.site-nav-link:hover {
+  color: var(--text);
 }
 
 p {
@@ -40,19 +63,12 @@ p {
 
 .projects ul {
   margin: 0;
-  padding-inline-start: 1.55rem;
-}
-
-.projects li {
-  padding-inline-start: 0.12rem;
+  padding: 0;
+  list-style: none;
 }
 
 .projects li + li {
   margin-top: 0.38rem;
-}
-
-.projects li::marker {
-  color: var(--marker);
 }
 
 .project-description {
