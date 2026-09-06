@@ -195,6 +195,7 @@ const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
                     href={item.href}
                     aria-label={item.ariaLabel}
                     aria-current={item.current}
+                    data-astro-reload={item.reload}
                   >
                     <span class="site-nav-label">
                       {item.text}

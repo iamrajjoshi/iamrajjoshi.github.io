@@ -110,6 +110,9 @@ export default defineConfig({
     service: sharpImageService(),
   },
   site: "https://rajjoshi.me",
+  redirects: {
+    "/clips/": "https://clip.rajjoshi.me/",
+  },
   vite: {
     plugins: [rawFonts([".ttf", ".woff"])],
     optimizeDeps: {

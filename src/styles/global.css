@@ -838,7 +838,7 @@ a {
   }
 }
 
-@media (max-width: 24em) {
+@media (max-width: 30em) {
   .site-masthead {
     flex-wrap: wrap;
     row-gap: 0;

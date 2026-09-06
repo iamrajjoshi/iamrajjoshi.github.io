@@ -33,4 +33,10 @@ export const navigation = [
     text: "Blog",
     ariaLabel: "Read Raj Joshi’s blog",
   },
+  {
+    href: "/clips/",
+    text: "Clips",
+    ariaLabel: "Browse Raj Joshi’s clips",
+    reload: true,
+  },
 ];
