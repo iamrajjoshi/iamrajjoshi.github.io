@@ -111,7 +111,7 @@ export default defineConfig({
   },
   site: "https://rajjoshi.me",
   redirects: {
-    "/clips/": "https://clip.rajjoshi.me/",
+    "/clips/": "https://clips.rajjoshi.me/",
   },
   vite: {
     plugins: [rawFonts([".ttf", ".woff"])],
