@@ -1,6 +1,12 @@
 ---
 import ThemeToggle from "@components/ThemeToggle.astro";
-import { author, defaultMeta, navigation, repo } from "@data/constants";
+import {
+  author,
+  blogMeta,
+  defaultMeta,
+  navigation,
+  repo,
+} from "@data/constants";
 import "@styles/site-foundation.css";
 import "@styles/global.css";
 import { execFileSync } from "node:child_process";
@@ -30,15 +36,24 @@ const pathname = Astro.url.pathname;
 const canonicalURL = new URL(pathname, Astro.site).href;
 const ogImageURL = new URL(ogImage.src, Astro.site).href;
 const documentTitle =
-  title === defaultMeta.title ? title : `${title} — ${defaultMeta.title}`;
+  title === defaultMeta.title || title === blogMeta.title
+    ? title
+    : `${title} — ${defaultMeta.title}`;
 const isArticle = Boolean(pubDate);
 const brandIsHeading = pathname === "/" || pathname === "/blog/";
-const blogNavigationState =
-  pathname === "/blog/"
-    ? "page"
-    : pathname.startsWith("/blog/")
-      ? "location"
-      : undefined;
+const siteNavigation = navigation.map((item) => {
+  let current: "page" | "location" | undefined;
+
+  if (item.href === "/" && pathname === "/") {
+    current = "page";
+  } else if (item.href === "/blog/" && pathname === "/blog/") {
+    current = "page";
+  } else if (item.href === "/blog/" && pathname.startsWith("/blog/")) {
+    current = "location";
+  }
+
+  return { ...item, current };
+});
 
 function getCommitSha() {
   try {
@@ -148,11 +163,7 @@ const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
             {
               brandIsHeading ? (
                 <h1 class="site-brand-heading">
-                  <a
-                    class="site-brand"
-                    href="/"
-                    aria-current={pathname === "/" ? "page" : undefined}
-                  >
+                  <a class="site-brand" href="/">
                     Raj Joshi
                   </a>
                 </h1>
@@ -175,17 +186,20 @@ const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
           </div>
           <ul class="site-actions">
             {
-              navigation.map((item) => (
+              siteNavigation.map((item) => (
                 <li>
                   <a
                     class="site-nav-link"
                     href={item.href}
                     aria-label={item.ariaLabel}
-                    aria-current={
-                      item.href === "/blog/" ? blogNavigationState : undefined
-                    }
+                    aria-current={item.current}
                   >
-                    {item.text}
+                    <span class="site-nav-label">
+                      {item.text}
+                      {item.current && (
+                        <span class="site-nav-indicator" aria-hidden="true" />
+                      )}
+                    </span>
                   </a>
                 </li>
               ))

@@ -84,12 +84,6 @@
             font-size: 0.75rem;
             letter-spacing: 0.01em;
           }
-          .site-link {
-            display: inline-block;
-            margin-top: 2rem;
-            color: var(--link);
-            text-underline-offset: 0.2em;
-          }
           @media (prefers-color-scheme: dark) {
             :root {
               --background: #28221c;
@@ -119,10 +113,6 @@
               </li>
             </xsl:for-each>
           </ul>
-          <a class="site-link">
-            <xsl:attribute name="href"><xsl:value-of select="/rss/channel/link" /></xsl:attribute>
-            Visit the blog →
-          </a>
         </main>
       </body>
     </html>

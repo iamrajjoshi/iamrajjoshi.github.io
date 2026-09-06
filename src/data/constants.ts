@@ -24,13 +24,13 @@ export const blogMeta = {
 
 export const navigation = [
   {
+    href: "/",
+    text: "About",
+    ariaLabel: "About Raj Joshi",
+  },
+  {
     href: "/blog/",
     text: "Blog",
     ariaLabel: "Read Raj Joshi’s blog",
-  },
-  {
-    href: "/rss.xml",
-    text: "RSS",
-    ariaLabel: "RSS feed",
   },
 ];

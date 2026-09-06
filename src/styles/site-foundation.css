@@ -22,8 +22,18 @@
   src: url("/fonts/figtree-latin-600-normal.woff2") format("woff2");
 }
 
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(site-nav-indicator) {
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 :root {
   color-scheme: light dark;
+  view-transition-name: none;
   --paper: #fff9eb;
   --ink: #28221c;
   --background: var(--paper);

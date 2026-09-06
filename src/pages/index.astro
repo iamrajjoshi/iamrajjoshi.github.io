@@ -119,10 +119,7 @@ const writing = (await getCollection("blog"))
   </section>
 
   <section class="link-list writing" aria-labelledby="writing-heading">
-    <div class="section-heading-row">
-      <h2 id="writing-heading">Recent writing</h2>
-      <a class="section-link" href="/blog/">All writing</a>
-    </div>
+    <h2 id="writing-heading">Recent writing</h2>
     <ul>
       {
         writing.map((post) => (
