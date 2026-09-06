@@ -1,9 +1,10 @@
 ---
+import ArticleThread from "@components/ArticleThread.astro";
 import PageTitle from "@components/PageTitle.astro";
 import Pagination from "@components/Pagination.astro";
 import { repo } from "@data/constants";
 import Layout from "@layouts/Layout.astro";
-import type { ImageMetadata } from "astro";
+import type { ImageMetadata, MarkdownHeading } from "astro";
 import { Image } from "astro:assets";
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
   url: string;
   updatedDate: Date | undefined;
   readingTime: string;
+  headings: MarkdownHeading[];
 }
 
 const {
@@ -26,6 +28,7 @@ const {
   url,
   updatedDate,
   readingTime,
+  headings,
 } = Astro.props;
 
 const meaningfulUpdatedDate =
@@ -58,63 +61,67 @@ const displayUpdatedDate = meaningfulUpdatedDate?.toLocaleDateString("en-US", {
   pubDate={pubDate}
   updatedDate={meaningfulUpdatedDate}
 >
-  <header class="article-header">
-    <PageTitle title={title} variant="article" />
-    <p class="article-meta">
-      <time datetime={pubDate.toISOString()}>{displayPubDate}</time>
-      <span>{readingTime}</span>
+  <div class="article-page">
+    <header class="article-header">
+      <PageTitle title={title} variant="article" />
+      <p class="article-meta">
+        <time datetime={pubDate.toISOString()}>{displayPubDate}</time>
+        <span>{readingTime}</span>
+        {
+          displayUpdatedDate && (
+            <span>
+              Updated{" "}
+              <time datetime={meaningfulUpdatedDate?.toISOString()}>
+                {displayUpdatedDate}
+              </time>
+            </span>
+          )
+        }
+      </p>
+      <hr class="article-rule" />
       {
-        displayUpdatedDate && (
-          <span>
-            Updated{" "}
-            <time datetime={meaningfulUpdatedDate?.toISOString()}>
-              {displayUpdatedDate}
-            </time>
-          </span>
+        image && (
+          <Image
+            class="article-hero"
+            src={image}
+            alt={imageAlt ?? ""}
+            loading="eager"
+            width={1200}
+            height={630}
+          />
         )
       }
-    </p>
-    <hr class="article-rule" />
-    {
-      image && (
-        <Image
-          class="article-hero"
-          src={image}
-          alt={imageAlt ?? ""}
-          loading="eager"
-          width={1200}
-          height={630}
-        />
-      )
-    }
-  </header>
+    </header>
 
-  <article class="prose">
-    <slot />
-  </article>
+    <ArticleThread headings={headings} />
 
-  <footer class="article-footer">
-    <ul class="article-actions">
-      <li>
-        <button
-          class="article-action article-share"
-          id="copy-link"
-          type="button"
-        >
-          Copy link
-        </button>
-      </li>
-      <li><a class="article-action" href={editUrl}>Suggest an edit</a></li>
-    </ul>
-    <p
-      class="share-status sr-only"
-      id="share-status"
-      role="status"
-      aria-live="polite"
-    >
-    </p>
-    <Pagination />
-  </footer>
+    <article class="prose">
+      <slot />
+    </article>
+
+    <footer class="article-footer">
+      <ul class="article-actions">
+        <li>
+          <button
+            class="article-action article-share"
+            id="copy-link"
+            type="button"
+          >
+            Copy link
+          </button>
+        </li>
+        <li><a class="article-action" href={editUrl}>Suggest an edit</a></li>
+      </ul>
+      <p
+        class="share-status sr-only"
+        id="share-status"
+        role="status"
+        aria-live="polite"
+      >
+      </p>
+      <Pagination />
+    </footer>
+  </div>
 </Layout>
 
 <script>

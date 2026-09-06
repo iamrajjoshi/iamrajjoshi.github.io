@@ -180,6 +180,10 @@ a {
   margin-bottom: 2.5rem;
 }
 
+.article-page {
+  position: relative;
+}
+
 .article-meta {
   display: flex;
   flex-wrap: wrap;
@@ -246,6 +250,7 @@ a {
 .prose h3,
 .prose h4 {
   position: relative;
+  scroll-margin-top: 2rem;
   color: var(--text);
   font-weight: 600;
   letter-spacing: -0.018em;

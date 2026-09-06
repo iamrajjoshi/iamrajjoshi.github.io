@@ -13,7 +13,7 @@ type Props = CollectionEntry<"blog">;
 
 const post = Astro.props;
 const frontmatter = post.data;
-const { Content, remarkPluginFrontmatter } = await render(post);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
 ---
 
 <BlogLayout
@@ -25,6 +25,7 @@ const { Content, remarkPluginFrontmatter } = await render(post);
   url={post.id}
   updatedDate={frontmatter.updatedDate}
   readingTime={remarkPluginFrontmatter.minutesRead}
+  headings={headings}
 >
   <Content />
 </BlogLayout>
