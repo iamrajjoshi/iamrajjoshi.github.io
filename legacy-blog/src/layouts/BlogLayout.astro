@@ -1,0 +1,156 @@
+---
+import ArticleThread from "@components/ArticleThread.astro";
+import PageTitle from "@components/PageTitle.astro";
+import Pagination from "@components/Pagination.astro";
+import { repo } from "@data/constants";
+import Layout from "@layouts/Layout.astro";
+import type { ImageMetadata, MarkdownHeading } from "astro";
+import { Image } from "astro:assets";
+
+interface Props {
+  title: string;
+  description: string;
+  image: ImageMetadata | undefined;
+  imageAlt: string | undefined;
+  pubDate: Date;
+  url: string;
+  updatedDate: Date | undefined;
+  readingTime: string;
+  headings: MarkdownHeading[];
+}
+
+const {
+  title,
+  description,
+  image,
+  imageAlt,
+  pubDate,
+  url,
+  updatedDate,
+  readingTime,
+  headings,
+} = Astro.props;
+
+const meaningfulUpdatedDate =
+  updatedDate && updatedDate.valueOf() !== pubDate.valueOf()
+    ? updatedDate
+    : undefined;
+const ogImage = {
+  src: `/image/${url}.png`,
+  alt: title,
+};
+const editUrl = `${repo}/blob/main/src/content/blog/${url}.mdx`;
+const displayPubDate = pubDate.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+const displayUpdatedDate = meaningfulUpdatedDate?.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+---
+
+<Layout
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  pubDate={pubDate}
+  updatedDate={meaningfulUpdatedDate}
+>
+  <div class="article-page">
+    <header class="article-header">
+      <PageTitle title={title} variant="article" />
+      <p class="article-meta">
+        <time datetime={pubDate.toISOString()}>{displayPubDate}</time>
+        <span>{readingTime}</span>
+        {
+          displayUpdatedDate && (
+            <span>
+              Updated{" "}
+              <time datetime={meaningfulUpdatedDate?.toISOString()}>
+                {displayUpdatedDate}
+              </time>
+            </span>
+          )
+        }
+      </p>
+      <hr class="article-rule" />
+      {
+        image && (
+          <Image
+            class="article-hero"
+            src={image}
+            alt={imageAlt ?? ""}
+            loading="eager"
+            width={1200}
+            height={630}
+          />
+        )
+      }
+    </header>
+
+    <ArticleThread headings={headings} />
+
+    <article class="prose">
+      <slot />
+    </article>
+
+    <footer class="article-footer">
+      <ul class="article-actions">
+        <li>
+          <button
+            class="article-action article-share"
+            id="copy-link"
+            type="button"
+          >
+            Copy link
+          </button>
+        </li>
+        <li><a class="article-action" href={editUrl}>Suggest an edit</a></li>
+      </ul>
+      <p
+        class="share-status sr-only"
+        id="share-status"
+        role="status"
+        aria-live="polite"
+      >
+      </p>
+      <Pagination />
+    </footer>
+  </div>
+</Layout>
+
+<script>
+  const copyButton = document.getElementById("copy-link");
+  const shareStatus = document.getElementById("share-status");
+
+  if (
+    copyButton instanceof HTMLButtonElement &&
+    shareStatus instanceof HTMLElement
+  ) {
+    const idleLabel = copyButton.textContent?.trim() ?? "Copy link";
+    let resetLabelTimer: number | undefined;
+
+    copyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        copyButton.textContent = "Copied";
+        shareStatus.textContent = "Link copied.";
+      } catch {
+        copyButton.textContent = "Try again";
+        shareStatus.textContent =
+          "Couldn’t copy the link. Use the address bar instead.";
+      }
+
+      window.clearTimeout(resetLabelTimer);
+      resetLabelTimer = window.setTimeout(() => {
+        copyButton.textContent = idleLabel;
+        shareStatus.textContent = "";
+      }, 2600);
+    });
+  }
+</script>

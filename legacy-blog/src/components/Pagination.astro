@@ -1,0 +1,35 @@
+---
+import { getCollection } from "astro:content";
+import { basename } from "node:path";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf(),
+);
+const currentIndex = posts.findIndex(
+  (post) => basename(Astro.url.pathname) === post.id,
+);
+const olderPost = posts[currentIndex - 1];
+const newerPost = posts[currentIndex + 1];
+---
+
+{
+  (olderPost || newerPost) && (
+    <nav class="pagination" aria-label="More articles">
+      {olderPost && (
+        <a class="pagination-link" href={`/blog/${olderPost.id}/`}>
+          <span class="pagination-label">← Older</span>
+          <span class="pagination-title">{olderPost.data.title}</span>
+        </a>
+      )}
+      {newerPost && (
+        <a
+          class="pagination-link pagination-link--next"
+          href={`/blog/${newerPost.id}/`}
+        >
+          <span class="pagination-label">Newer →</span>
+          <span class="pagination-title">{newerPost.data.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}

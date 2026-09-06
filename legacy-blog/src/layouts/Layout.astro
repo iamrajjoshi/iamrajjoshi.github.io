@@ -1,0 +1,170 @@
+---
+import ThemeToggle from "@components/ThemeToggle.astro";
+import { author, defaultMeta, navigation, repo } from "@data/constants";
+import "@styles/site-foundation.css";
+import "@styles/global.css";
+import { execFileSync } from "node:child_process";
+
+interface Props {
+  home?: boolean;
+  title?: string;
+  description?: string;
+  ogImage?: {
+    src: string;
+    alt: string;
+  };
+  pubDate?: Date;
+  updatedDate?: Date | undefined;
+  noindex?: boolean;
+}
+
+const {
+  home = false,
+  title = defaultMeta.title,
+  description = defaultMeta.description,
+  ogImage = defaultMeta.ogImage,
+  pubDate,
+  updatedDate,
+  noindex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url).href;
+const ogImageURL = new URL(ogImage.src, Astro.site).href;
+const documentTitle =
+  title === defaultMeta.title ? title : `${title} — ${defaultMeta.title}`;
+const isArticle = Boolean(pubDate);
+
+function getCommitSha() {
+  try {
+    const sha = execFileSync("git", ["rev-parse", "--short", "HEAD"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+
+    return /^[0-9a-f]+$/i.test(sha) ? sha : null;
+  } catch {
+    return null;
+  }
+}
+
+const commitSha = getCommitSha();
+const commitLabel = commitSha
+  ? `View commit ${commitSha} on GitHub`
+  : "View source on GitHub";
+const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
+---
+
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{documentTitle}</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="canonical" href={canonicalURL} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={defaultMeta.title}
+      href="/rss.xml"
+    />
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content="#fff9eb"
+      media="(prefers-color-scheme: light)"
+      data-theme-color="light"
+    />
+    <meta
+      name="theme-color"
+      content="#28221c"
+      media="(prefers-color-scheme: dark)"
+      data-theme-color="dark"
+    />
+    <meta property="og:type" content={isArticle ? "article" : "website"} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:site_name" content={defaultMeta.title} />
+    <meta property="og:image:alt" content={ogImage.alt} />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+    <meta name="generator" content={Astro.generator} />
+    <meta
+      name="robots"
+      content={noindex ? "noindex, follow" : "index, follow"}
+    />
+    <meta name="author" content={author} />
+    {
+      pubDate && (
+        <meta
+          property="article:published_time"
+          content={pubDate.toISOString()}
+        />
+      )
+    }
+    {
+      updatedDate && (
+        <meta
+          property="article:modified_time"
+          content={updatedDate.toISOString()}
+        />
+      )
+    }
+    <script is:inline src="/theme.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="site-shell">
+      <header class="site-header">
+        <nav class="site-masthead" aria-label="Primary navigation">
+          {
+            home ? (
+              <h1 class="site-brand-heading">
+                <a class="site-brand" href="/" aria-current="page">
+                  Raj Joshi
+                </a>
+              </h1>
+            ) : (
+              <a class="site-brand" href="/" aria-label="Raj Joshi — blog home">
+                Raj Joshi
+              </a>
+            )
+          }
+          <ul class="site-actions">
+            {
+              navigation.map((item) => (
+                <li>
+                  <a
+                    class="site-nav-link"
+                    href={item.href}
+                    aria-label={item.ariaLabel}
+                    rel={item.rel}
+                  >
+                    {item.text}
+                  </a>
+                </li>
+              ))
+            }
+            <li><ThemeToggle /></li>
+          </ul>
+        </nav>
+      </header>
+      <main class="site-main" id="main-content">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <a class="commit-link" href={commitUrl} aria-label={commitLabel}>
+          {commitSha ?? "Source"}
+        </a>
+      </footer>
+    </div>
+  </body>
+</html>

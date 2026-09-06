@@ -1,0 +1,16 @@
+---
+const { size, link } = Astro.props;
+---
+
+<iframe
+  class="spotify-embed"
+  src={link.replace(
+    "https://open.spotify.com/",
+    "https://open.spotify.com/embed/",
+  )}
+  width="100%"
+  height={size === "small" ? "152" : "352"}
+  title="Spotify player"
+  allowfullscreen
+  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+  loading="lazy"></iframe>

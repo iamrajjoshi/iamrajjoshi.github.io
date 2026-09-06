@@ -1,0 +1,25 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+type Props = CollectionEntry<"blog">;
+
+const { data, id } = Astro.props;
+const displayDate = data.pubDate.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+---
+
+<li>
+  <a class="post-row-link" href={`/blog/${id}/`}>
+    <time class="post-date" datetime={data.pubDate.toISOString()}>
+      {displayDate}
+    </time>
+    <div class="post-copy">
+      <p class="post-title">{data.title}</p>
+      <p class="post-description">{data.description}</p>
+    </div>
+  </a>
+</li>

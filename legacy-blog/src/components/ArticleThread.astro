@@ -1,0 +1,302 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const headings = Astro.props.headings
+  .filter(
+    ({ depth, slug }) => depth === 2 && !slug.startsWith("footnote-label"),
+  )
+  .map((heading) => ({
+    ...heading,
+    text: heading.text.replace(/^#\s*/, ""),
+  }));
+---
+
+{
+  headings.length > 1 && (
+    <nav
+      class="article-thread"
+      aria-label="Article sections"
+      data-article-thread
+    >
+      <div class="article-thread__inner" data-thread-inner>
+        <span class="article-thread__track" aria-hidden="true">
+          <span class="article-thread__progress" data-thread-progress />
+          <span class="article-thread__marker" data-thread-marker />
+        </span>
+        <ol class="article-thread__list">
+          {headings.map((heading) => (
+            <li>
+              <a
+                class="article-thread__link"
+                href={`#${heading.slug}`}
+                data-thread-link
+              >
+                <span class="article-thread__stitch" aria-hidden="true" />
+                <span class="article-thread__label">{heading.text}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </nav>
+  )
+}
+
+<script>
+  const thread = document.querySelector<HTMLElement>("[data-article-thread]");
+  const threadInner = thread?.querySelector<HTMLElement>("[data-thread-inner]");
+  const threadProgress = thread?.querySelector<HTMLElement>(
+    "[data-thread-progress]",
+  );
+  const threadMarker = thread?.querySelector<HTMLElement>(
+    "[data-thread-marker]",
+  );
+  const links = Array.from(
+    thread?.querySelectorAll<HTMLAnchorElement>("[data-thread-link]") ?? [],
+  );
+  const sections = links
+    .map((link) => {
+      const id = decodeURIComponent(link.hash.slice(1));
+      const heading = document.getElementById(id);
+      return heading ? { heading, link } : null;
+    })
+    .filter((section): section is NonNullable<typeof section> =>
+      Boolean(section),
+    );
+
+  let frame = 0;
+  let trackStart = 0;
+  let trackLength = 0;
+  let stitchPositions: number[] = [];
+
+  function measureThread() {
+    if (!thread || !threadInner || !threadProgress || !threadMarker) return;
+
+    const stitches = Array.from(
+      thread.querySelectorAll<HTMLElement>(".article-thread__stitch"),
+    );
+    const firstStitch = stitches.at(0);
+    const lastStitch = stitches.at(-1);
+    if (!firstStitch || !lastStitch) return;
+
+    const innerBox = threadInner.getBoundingClientRect();
+    stitchPositions = stitches.map((stitch) => {
+      const stitchBox = stitch.getBoundingClientRect();
+      return stitchBox.top + stitchBox.height / 2 - innerBox.top;
+    });
+    trackStart = stitchPositions[0] ?? 0;
+    const trackEnd = stitchPositions.at(-1) ?? trackStart;
+    trackLength = Math.max(0, trackEnd - trackStart);
+
+    thread.style.setProperty("--thread-start", `${trackStart}px`);
+    thread.style.setProperty("--thread-length", `${trackLength}px`);
+    updateThread();
+    thread.dataset.ready = "true";
+  }
+
+  function updateThread() {
+    if (!thread || !threadProgress || !threadMarker || sections.length === 0) {
+      return;
+    }
+
+    const readingLine = window.scrollY + window.innerHeight * 0.3;
+    const sectionTops = sections.map(
+      ({ heading }) => heading.getBoundingClientRect().top + window.scrollY,
+    );
+    let activeIndex = 0;
+
+    sectionTops.forEach((top, index) => {
+      if (top <= readingLine) activeIndex = index;
+    });
+
+    const pageBottom = window.scrollY + window.innerHeight;
+    const documentBottom = document.documentElement.scrollHeight;
+    if (pageBottom >= documentBottom - 2) activeIndex = sections.length - 1;
+
+    sections.forEach(({ link }, index) => {
+      if (index === activeIndex) {
+        link.setAttribute("aria-current", "location");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    const markerPosition = Math.max(
+      0,
+      (stitchPositions[activeIndex] ?? trackStart) - trackStart,
+    );
+    const threadProgressFraction =
+      trackLength === 0 ? 0 : markerPosition / trackLength;
+
+    threadProgress.style.transform = `scaleY(${threadProgressFraction})`;
+    threadMarker.style.transform = `translate(-50%, calc(${markerPosition}px - 50%))`;
+  }
+
+  function requestUpdate() {
+    if (frame) return;
+    frame = window.requestAnimationFrame(() => {
+      frame = 0;
+      updateThread();
+    });
+  }
+
+  if (sections.length > 1) {
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        measureThread();
+      });
+    });
+
+    document.fonts.ready.then(measureThread);
+  }
+</script>
+
+<style>
+  .article-thread {
+    display: none;
+  }
+
+  @media (min-width: 73rem) {
+    .article-thread {
+      --thread-axis: 0.375rem;
+      position: absolute;
+      inset: 0 auto 0 calc(100% + 2rem);
+      display: block;
+      width: 12rem;
+      color: var(--muted);
+      font-size: var(--text-xs);
+      line-height: 1.25;
+    }
+
+    .article-thread__inner {
+      --thread-offset: clamp(6rem, calc(16vh + 3rem), 11rem);
+
+      position: sticky;
+      top: var(--thread-offset);
+      margin-top: 3rem;
+      max-height: calc(100svh - var(--thread-offset) - 3rem);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .article-thread__inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .article-thread__track {
+      position: absolute;
+      top: var(--thread-start, 1rem);
+      left: var(--thread-axis);
+      width: 1px;
+      height: var(--thread-length, 0);
+      background: var(--rule);
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+
+    .article-thread__progress {
+      position: absolute;
+      inset: 0;
+      background: var(--link);
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+
+    .article-thread__marker {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      left: 50%;
+      width: 0.625rem;
+      height: 0.625rem;
+      border: 1px solid var(--link);
+      border-radius: 50%;
+      background: transparent;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition:
+        transform 170ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 120ms ease;
+    }
+
+    .article-thread__marker::after {
+      position: absolute;
+      inset: 0.125rem;
+      border-radius: inherit;
+      background: var(--link);
+      content: "";
+    }
+
+    .article-thread[data-ready="true"] .article-thread__marker {
+      opacity: 1;
+    }
+
+    .article-thread__list {
+      display: grid;
+      gap: 0.2rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .article-thread__link {
+      position: relative;
+      display: grid;
+      grid-template-columns: calc(var(--thread-axis) * 2) minmax(0, 1fr);
+      gap: 0.55rem;
+      align-items: center;
+      min-height: 2rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 140ms ease;
+    }
+
+    .article-thread__link:hover,
+    .article-thread__link:focus-visible,
+    .article-thread__link[aria-current="location"] {
+      color: var(--link);
+    }
+
+    .article-thread__label {
+      transition: transform 170ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .article-thread__link[aria-current="location"] .article-thread__label {
+      transform: translateX(0.15rem);
+    }
+
+    .article-thread__stitch {
+      position: relative;
+      z-index: 1;
+      width: 0.25rem;
+      height: 0.25rem;
+      margin-inline: auto;
+      border-radius: 50%;
+      background: var(--faint);
+    }
+
+    .article-thread__link[aria-current="location"] .article-thread__stitch {
+      background: var(--link);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-thread__label,
+    .article-thread__marker {
+      transition: none;
+    }
+  }
+
+  @media print {
+    .article-thread {
+      display: none;
+    }
+  }
+</style>

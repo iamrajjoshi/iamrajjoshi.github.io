@@ -1,0 +1,22 @@
+---
+import PageTitle from "@components/PageTitle.astro";
+import Layout from "@layouts/Layout.astro";
+
+const title = "Page not found";
+const description = "The page you’re looking for doesn’t exist.";
+---
+
+<Layout title={title} description={description} noindex>
+  <section class="not-found">
+    <PageTitle title="404" />
+    <p class="page-deck">This page wandered off.</p>
+    <a class="text-link" href="/">Return to the blog&nbsp;→</a>
+    <img
+      class="not-found-image"
+      src="/sad-octopus.jpg"
+      width="360"
+      height="360"
+      alt="A sad octopus"
+    />
+  </section>
+</Layout>
