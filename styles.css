@@ -49,11 +49,11 @@ p {
   margin-top: 1.35rem;
 }
 
-.projects {
+.link-list {
   margin-top: 3.1rem;
 }
 
-.projects h2 {
+.link-list h2 {
   margin: 0 0 1rem;
   font-size: var(--text-section);
   font-weight: 600;
@@ -61,17 +61,48 @@ p {
   letter-spacing: -0.015em;
 }
 
-.projects ul {
+.link-list ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.projects li + li {
+.link-list li + li {
   margin-top: 0.38rem;
 }
 
-.project-description {
+.writing {
+  margin-top: 3rem;
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-heading-row h2 {
+  margin-bottom: 0;
+}
+
+.section-link {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-decoration-color: transparent;
+  text-decoration-line: underline;
+  text-underline-offset: 0.24em;
+}
+
+.section-link:hover,
+.section-link:focus-visible {
+  color: var(--link-hover);
+  text-decoration-color: currentcolor;
+}
+
+.list-description {
   color: var(--muted);
 }
 
@@ -80,6 +111,14 @@ p {
   display: inline-block;
   white-space: nowrap;
   text-decoration: none;
+}
+
+.link-list .flow-link {
+  font-weight: 600;
+}
+
+.writing .flow-link {
+  white-space: normal;
 }
 
 .flow-link::after {
@@ -96,10 +135,6 @@ p {
   text-underline-offset: 0.08em;
   transition: clip-path 280ms cubic-bezier(0.22, 1, 0.36, 1);
   user-select: none;
-}
-
-.projects .flow-link {
-  font-weight: 600;
 }
 
 .flow-link:hover,
@@ -132,7 +167,23 @@ p {
 }
 
 @media (max-width: 30em) {
-  .projects {
+  .site-identity {
+    gap: 0.15rem;
+  }
+
+  .avatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-basis: 2.75rem;
+  }
+
+  .avatar-image {
+    width: 2.75rem;
+    height: 2.75rem;
+    transform: scale(1.15);
+  }
+
+  .link-list {
     margin-top: 2.7rem;
   }
 }

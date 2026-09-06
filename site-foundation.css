@@ -173,6 +173,23 @@ button {
   cursor: pointer;
 }
 
+.skip-link {
+  position: fixed;
+  z-index: 20;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--text);
+  color: var(--background);
+  font-size: var(--text-xs);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 :focus-visible {
   border-radius: 0.125rem;
   outline: 2px solid var(--focus);
@@ -302,6 +319,10 @@ button {
   :root {
     --page-padding-top: 2.75rem;
     --content-gap: 2.5rem;
+  }
+
+  .site-masthead {
+    gap: 0.75rem;
   }
 }
 
