@@ -71,6 +71,14 @@ a {
   color: var(--text);
 }
 
+.site-nav-link[aria-current] {
+  color: var(--text);
+  text-decoration-line: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.22em;
+}
+
 .site-identity {
   display: flex;
   align-items: center;

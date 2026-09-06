@@ -22,26 +22,15 @@ export const blogMeta = {
   },
 };
 
-export const homeNavigation = [
+export const navigation = [
   {
     href: "/blog/",
     text: "Blog",
     ariaLabel: "Read Raj Joshi’s blog",
-    rel: undefined,
-  },
-];
-
-export const blogNavigation = [
-  {
-    href: "/",
-    text: "About",
-    ariaLabel: "About Raj Joshi",
-    rel: "author",
   },
   {
     href: "/rss.xml",
     text: "RSS",
     ariaLabel: "RSS feed",
-    rel: undefined,
   },
 ];

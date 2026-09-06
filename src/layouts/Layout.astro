@@ -1,18 +1,11 @@
 ---
 import ThemeToggle from "@components/ThemeToggle.astro";
-import {
-  author,
-  blogNavigation,
-  defaultMeta,
-  homeNavigation,
-  repo,
-} from "@data/constants";
+import { author, defaultMeta, navigation, repo } from "@data/constants";
 import "@styles/site-foundation.css";
 import "@styles/global.css";
 import { execFileSync } from "node:child_process";
 
 interface Props {
-  section?: "home" | "blog";
   title?: string;
   description?: string;
   ogImage?: {
@@ -25,7 +18,6 @@ interface Props {
 }
 
 const {
-  section = Astro.url.pathname.startsWith("/blog") ? "blog" : "home",
   title = defaultMeta.title,
   description = defaultMeta.description,
   ogImage = defaultMeta.ogImage,
@@ -41,7 +33,12 @@ const documentTitle =
   title === defaultMeta.title ? title : `${title} — ${defaultMeta.title}`;
 const isArticle = Boolean(pubDate);
 const brandIsHeading = pathname === "/" || pathname === "/blog/";
-const navigation = section === "blog" ? blogNavigation : homeNavigation;
+const blogNavigationState =
+  pathname === "/blog/"
+    ? "page"
+    : pathname.startsWith("/blog/")
+      ? "location"
+      : undefined;
 
 function getCommitSha() {
   try {
@@ -184,7 +181,9 @@ const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
                     class="site-nav-link"
                     href={item.href}
                     aria-label={item.ariaLabel}
-                    rel={item.rel}
+                    aria-current={
+                      item.href === "/blog/" ? blogNavigationState : undefined
+                    }
                   >
                     {item.text}
                   </a>
