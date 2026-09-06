@@ -33,37 +33,68 @@ const feedUrl = new URL(feedPath, Astro.site).href;
 </Layout>
 
 <script>
-  const copyLink = document.getElementById("copy-feed");
-  const copyStatus = document.getElementById("feed-status");
+  let cleanupFeedLink: (() => void) | undefined;
 
-  if (
-    copyLink instanceof HTMLAnchorElement &&
-    copyStatus instanceof HTMLElement &&
-    navigator.clipboard
-  ) {
-    const feedUrl = copyLink.dataset.feedUrl;
-    const idleLabel = copyLink.textContent?.trim() ?? "Copy the feed address.";
+  function setupFeedLink() {
+    cleanupFeedLink?.();
+    cleanupFeedLink = undefined;
+
+    const copyLink = document.getElementById("copy-feed");
+    const copyStatus = document.getElementById("feed-status");
+    if (
+      !(copyLink instanceof HTMLAnchorElement) ||
+      !(copyStatus instanceof HTMLElement) ||
+      !navigator.clipboard
+    ) {
+      return;
+    }
+
+    const activeLink = copyLink;
+    const activeStatus = copyStatus;
+    const feedUrl = activeLink.dataset.feedUrl;
+    const idleLabel =
+      activeLink.textContent?.trim() ?? "Copy the feed address.";
+    let disposed = false;
     let resetLabelTimer: number | undefined;
 
-    copyLink.addEventListener("click", async (event) => {
+    async function handleCopy(event: MouseEvent) {
       if (!feedUrl) return;
 
       event.preventDefault();
 
       try {
         await navigator.clipboard.writeText(feedUrl);
-        copyLink.textContent = "Copied.";
-        copyStatus.textContent = "Feed address copied.";
+        if (disposed) return;
+        activeLink.textContent = "Copied.";
+        activeStatus.textContent = "Feed address copied.";
       } catch {
-        window.location.assign(copyLink.href);
+        if (disposed) return;
+        window.location.assign(activeLink.href);
         return;
       }
 
       window.clearTimeout(resetLabelTimer);
       resetLabelTimer = window.setTimeout(() => {
-        copyLink.textContent = idleLabel;
-        copyStatus.textContent = "";
+        activeLink.textContent = idleLabel;
+        activeStatus.textContent = "";
       }, 2600);
-    });
+    }
+
+    activeLink.addEventListener("click", handleCopy);
+    cleanupFeedLink = () => {
+      disposed = true;
+      activeLink.removeEventListener("click", handleCopy);
+      window.clearTimeout(resetLabelTimer);
+      activeLink.textContent = idleLabel;
+      activeStatus.textContent = "";
+    };
   }
+
+  function teardownFeedLink() {
+    cleanupFeedLink?.();
+    cleanupFeedLink = undefined;
+  }
+
+  document.addEventListener("astro:page-load", setupFeedLink);
+  document.addEventListener("astro:before-swap", teardownFeedLink);
 </script>

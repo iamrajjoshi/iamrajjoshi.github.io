@@ -125,32 +125,62 @@ const displayUpdatedDate = meaningfulUpdatedDate?.toLocaleDateString("en-US", {
 </Layout>
 
 <script>
-  const copyButton = document.getElementById("copy-link");
-  const shareStatus = document.getElementById("share-status");
+  let cleanupCopyLink: (() => void) | undefined;
 
-  if (
-    copyButton instanceof HTMLButtonElement &&
-    shareStatus instanceof HTMLElement
-  ) {
-    const idleLabel = copyButton.textContent?.trim() ?? "Copy link";
+  function setupCopyLink() {
+    cleanupCopyLink?.();
+    cleanupCopyLink = undefined;
+
+    const copyButton = document.getElementById("copy-link");
+    const shareStatus = document.getElementById("share-status");
+    if (
+      !(copyButton instanceof HTMLButtonElement) ||
+      !(shareStatus instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    const activeButton = copyButton;
+    const activeStatus = shareStatus;
+    const idleLabel = activeButton.textContent?.trim() ?? "Copy link";
+    let disposed = false;
     let resetLabelTimer: number | undefined;
 
-    copyButton.addEventListener("click", async () => {
+    async function handleCopy() {
       try {
         await navigator.clipboard.writeText(window.location.href);
-        copyButton.textContent = "Copied";
-        shareStatus.textContent = "Link copied.";
+        if (disposed) return;
+        activeButton.textContent = "Copied";
+        activeStatus.textContent = "Link copied.";
       } catch {
-        copyButton.textContent = "Try again";
-        shareStatus.textContent =
+        if (disposed) return;
+        activeButton.textContent = "Try again";
+        activeStatus.textContent =
           "Couldn’t copy the link. Use the address bar instead.";
       }
 
       window.clearTimeout(resetLabelTimer);
       resetLabelTimer = window.setTimeout(() => {
-        copyButton.textContent = idleLabel;
-        shareStatus.textContent = "";
+        activeButton.textContent = idleLabel;
+        activeStatus.textContent = "";
       }, 2600);
-    });
+    }
+
+    activeButton.addEventListener("click", handleCopy);
+    cleanupCopyLink = () => {
+      disposed = true;
+      activeButton.removeEventListener("click", handleCopy);
+      window.clearTimeout(resetLabelTimer);
+      activeButton.textContent = idleLabel;
+      activeStatus.textContent = "";
+    };
   }
+
+  function teardownCopyLink() {
+    cleanupCopyLink?.();
+    cleanupCopyLink = undefined;
+  }
+
+  document.addEventListener("astro:page-load", setupCopyLink);
+  document.addEventListener("astro:before-swap", teardownCopyLink);
 </script>

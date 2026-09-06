@@ -1,14 +1,17 @@
 (() => {
-  const themeColors = {
-    dark: "#28221c",
-    light: "#fff9eb",
-  };
+  const runtimeKey = "__rajThemeRuntime";
   const storageKey = "raj-theme";
   const legacyStorageKey = "theme";
-  const themePreference = window.matchMedia("(prefers-color-scheme: dark)");
-  const root = document.documentElement;
 
-  root.classList.add("js");
+  const existingRuntime = window[runtimeKey];
+  if (existingRuntime) {
+    existingRuntime.refresh();
+    return;
+  }
+
+  const themePreference = window.matchMedia("(prefers-color-scheme: dark)");
+
+  document.documentElement.classList.add("js");
 
   function isTheme(value) {
     return value === "dark" || value === "light";
@@ -87,6 +90,8 @@
   }
 
   function applyTheme(theme, persist = false) {
+    const root = document.documentElement;
+    root.classList.add("js");
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
     updateThemeColor(theme);
@@ -97,26 +102,39 @@
     }
   }
 
+  function refreshTheme() {
+    selectedTheme = getStoredTheme();
+    applyTheme(getActiveTheme());
+  }
+
+  window[runtimeKey] = { refresh: refreshTheme };
+
   applyTheme(getActiveTheme());
 
-  document.addEventListener("DOMContentLoaded", () => {
-    updateToggles(getActiveTheme());
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", refreshTheme, { once: true });
+  } else {
+    refreshTheme();
+  }
 
-    for (const toggle of document.querySelectorAll("[data-theme-toggle]")) {
-      if (!(toggle instanceof HTMLButtonElement)) {
-        continue;
-      }
-
-      toggle.addEventListener("click", () => {
-        selectedTheme = getActiveTheme() === "dark" ? "light" : "dark";
-        applyTheme(selectedTheme, true);
-      });
+  document.addEventListener("click", (event) => {
+    const target =
+      event.target instanceof Element
+        ? event.target.closest("[data-theme-toggle]")
+        : null;
+    if (!(target instanceof HTMLButtonElement)) {
+      return;
     }
 
-    themePreference.addEventListener("change", (event) => {
-      if (!selectedTheme) {
-        applyTheme(event.matches ? "dark" : "light");
-      }
-    });
+    selectedTheme = getActiveTheme() === "dark" ? "light" : "dark";
+    applyTheme(selectedTheme, true);
+  });
+
+  document.addEventListener("astro:after-swap", refreshTheme);
+
+  themePreference.addEventListener("change", (event) => {
+    if (!selectedTheme) {
+      applyTheme(event.matches ? "dark" : "light");
+    }
   });
 })();

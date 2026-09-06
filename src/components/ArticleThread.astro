@@ -47,115 +47,154 @@ const headings = Astro.props.headings
 }
 
 <script>
-  const thread = document.querySelector<HTMLElement>("[data-article-thread]");
-  const threadInner = thread?.querySelector<HTMLElement>("[data-thread-inner]");
-  const threadProgress = thread?.querySelector<HTMLElement>(
-    "[data-thread-progress]",
-  );
-  const threadMarker = thread?.querySelector<HTMLElement>(
-    "[data-thread-marker]",
-  );
-  const links = Array.from(
-    thread?.querySelectorAll<HTMLAnchorElement>("[data-thread-link]") ?? [],
-  );
-  const sections = links
-    .map((link) => {
-      const id = decodeURIComponent(link.hash.slice(1));
-      const heading = document.getElementById(id);
-      return heading ? { heading, link } : null;
-    })
-    .filter((section): section is NonNullable<typeof section> =>
-      Boolean(section),
+  let cleanupArticleThread: (() => void) | undefined;
+
+  function setupArticleThread() {
+    cleanupArticleThread?.();
+    cleanupArticleThread = undefined;
+
+    const thread = document.querySelector<HTMLElement>("[data-article-thread]");
+    const threadInner = thread?.querySelector<HTMLElement>(
+      "[data-thread-inner]",
     );
-
-  let frame = 0;
-  let trackStart = 0;
-  let trackLength = 0;
-  let stitchPositions: number[] = [];
-
-  function measureThread() {
-    if (!thread || !threadInner || !threadProgress || !threadMarker) return;
-
-    const stitches = Array.from(
-      thread.querySelectorAll<HTMLElement>(".article-thread__stitch"),
+    const threadProgress = thread?.querySelector<HTMLElement>(
+      "[data-thread-progress]",
     );
-    const firstStitch = stitches.at(0);
-    const lastStitch = stitches.at(-1);
-    if (!firstStitch || !lastStitch) return;
+    const threadMarker = thread?.querySelector<HTMLElement>(
+      "[data-thread-marker]",
+    );
+    const links = Array.from(
+      thread?.querySelectorAll<HTMLAnchorElement>("[data-thread-link]") ?? [],
+    );
+    const sections = links
+      .map((link) => {
+        const id = decodeURIComponent(link.hash.slice(1));
+        const heading = document.getElementById(id);
+        return heading ? { heading, link } : null;
+      })
+      .filter((section): section is NonNullable<typeof section> =>
+        Boolean(section),
+      );
 
-    const innerBox = threadInner.getBoundingClientRect();
-    stitchPositions = stitches.map((stitch) => {
-      const stitchBox = stitch.getBoundingClientRect();
-      return stitchBox.top + stitchBox.height / 2 - innerBox.top;
-    });
-    trackStart = stitchPositions[0] ?? 0;
-    const trackEnd = stitchPositions.at(-1) ?? trackStart;
-    trackLength = Math.max(0, trackEnd - trackStart);
-
-    thread.style.setProperty("--thread-start", `${trackStart}px`);
-    thread.style.setProperty("--thread-length", `${trackLength}px`);
-    updateThread();
-    thread.dataset.ready = "true";
-  }
-
-  function updateThread() {
-    if (!thread || !threadProgress || !threadMarker || sections.length === 0) {
+    if (
+      !thread ||
+      !threadInner ||
+      !threadProgress ||
+      !threadMarker ||
+      sections.length <= 1
+    ) {
       return;
     }
 
-    const readingLine = window.scrollY + window.innerHeight * 0.3;
-    const sectionTops = sections.map(
-      ({ heading }) => heading.getBoundingClientRect().top + window.scrollY,
-    );
-    let activeIndex = 0;
+    const activeThread = thread;
+    const activeThreadInner = threadInner;
+    const activeThreadProgress = threadProgress;
+    const activeThreadMarker = threadMarker;
+    let disposed = false;
+    let frame = 0;
+    let trackStart = 0;
+    let trackLength = 0;
+    let stitchPositions: number[] = [];
 
-    sectionTops.forEach((top, index) => {
-      if (top <= readingLine) activeIndex = index;
-    });
+    function updateThread() {
+      if (disposed || sections.length === 0) return;
 
-    const pageBottom = window.scrollY + window.innerHeight;
-    const documentBottom = document.documentElement.scrollHeight;
-    if (pageBottom >= documentBottom - 2) activeIndex = sections.length - 1;
+      const readingLine = window.scrollY + window.innerHeight * 0.3;
+      const sectionTops = sections.map(
+        ({ heading }) => heading.getBoundingClientRect().top + window.scrollY,
+      );
+      let activeIndex = 0;
 
-    sections.forEach(({ link }, index) => {
-      if (index === activeIndex) {
-        link.setAttribute("aria-current", "location");
-      } else {
-        link.removeAttribute("aria-current");
-      }
-    });
+      sectionTops.forEach((top, index) => {
+        if (top <= readingLine) activeIndex = index;
+      });
 
-    const markerPosition = Math.max(
-      0,
-      (stitchPositions[activeIndex] ?? trackStart) - trackStart,
-    );
-    const threadProgressFraction =
-      trackLength === 0 ? 0 : markerPosition / trackLength;
+      const pageBottom = window.scrollY + window.innerHeight;
+      const documentBottom = document.documentElement.scrollHeight;
+      if (pageBottom >= documentBottom - 2) activeIndex = sections.length - 1;
 
-    threadProgress.style.transform = `scaleY(${threadProgressFraction})`;
-    threadMarker.style.transform = `translate(-50%, calc(${markerPosition}px - 50%))`;
-  }
+      sections.forEach(({ link }, index) => {
+        if (index === activeIndex) {
+          link.setAttribute("aria-current", "location");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      });
 
-  function requestUpdate() {
-    if (frame) return;
-    frame = window.requestAnimationFrame(() => {
-      frame = 0;
+      const markerPosition = Math.max(
+        0,
+        (stitchPositions[activeIndex] ?? trackStart) - trackStart,
+      );
+      const threadProgressFraction =
+        trackLength === 0 ? 0 : markerPosition / trackLength;
+
+      activeThreadProgress.style.transform = `scaleY(${threadProgressFraction})`;
+      activeThreadMarker.style.transform = `translate(-50%, calc(${markerPosition}px - 50%))`;
+    }
+
+    function measureThread() {
+      if (disposed) return;
+
+      const stitches = Array.from(
+        activeThread.querySelectorAll<HTMLElement>(".article-thread__stitch"),
+      );
+      const firstStitch = stitches.at(0);
+      const lastStitch = stitches.at(-1);
+      if (!firstStitch || !lastStitch) return;
+
+      const innerBox = activeThreadInner.getBoundingClientRect();
+      stitchPositions = stitches.map((stitch) => {
+        const stitchBox = stitch.getBoundingClientRect();
+        return stitchBox.top + stitchBox.height / 2 - innerBox.top;
+      });
+      trackStart = stitchPositions[0] ?? 0;
+      const trackEnd = stitchPositions.at(-1) ?? trackStart;
+      trackLength = Math.max(0, trackEnd - trackStart);
+
+      activeThread.style.setProperty("--thread-start", `${trackStart}px`);
+      activeThread.style.setProperty("--thread-length", `${trackLength}px`);
       updateThread();
-    });
-  }
+      activeThread.dataset.ready = "true";
+    }
 
-  if (sections.length > 1) {
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", () => {
+    function requestUpdate() {
+      if (disposed || frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        updateThread();
+      });
+    }
+
+    function requestMeasure() {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
         frame = 0;
         measureThread();
       });
+    }
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestMeasure);
+    void document.fonts.ready.then(() => {
+      if (!disposed) measureThread();
     });
 
-    document.fonts.ready.then(measureThread);
+    cleanupArticleThread = () => {
+      disposed = true;
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestMeasure);
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+    };
   }
+
+  function teardownArticleThread() {
+    cleanupArticleThread?.();
+    cleanupArticleThread = undefined;
+  }
+
+  document.addEventListener("astro:page-load", setupArticleThread);
+  document.addEventListener("astro:before-swap", teardownArticleThread);
 </script>
 
 <style>

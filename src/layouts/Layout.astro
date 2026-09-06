@@ -9,6 +9,7 @@ import {
 } from "@data/constants";
 import "@styles/site-foundation.css";
 import "@styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import { execFileSync } from "node:child_process";
 
 interface Props {
@@ -131,6 +132,7 @@ const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
     <meta name="generator" content={Astro.generator} />
+    <ClientRouter fallback="swap" />
     <meta
       name="robots"
       content={noindex ? "noindex, follow" : "index, follow"}
