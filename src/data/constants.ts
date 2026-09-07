@@ -34,9 +34,8 @@ export const navigation = [
     ariaLabel: "Read Raj Joshi’s blog",
   },
   {
-    href: "/clips/",
+    href: "https://clips.rajjoshi.me/",
     text: "Clips",
     ariaLabel: "Browse Raj Joshi’s clips",
-    reload: true,
   },
 ];
