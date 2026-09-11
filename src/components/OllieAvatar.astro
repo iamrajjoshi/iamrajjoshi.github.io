@@ -1,0 +1,224 @@
+---
+import atlas from "~/assets/ollie/spritesheet.webp";
+import still from "~/assets/ollie/still.webp";
+---
+
+<button
+  class="ollie-avatar"
+  type="button"
+  data-ollie-avatar
+  data-atlas={atlas.src}
+  aria-label="Ollie"
+  title="Ollie"
+  disabled
+>
+  <img
+    class="ollie-still"
+    src={still.src}
+    width="96"
+    height="104"
+    alt=""
+    aria-hidden="true"
+    decoding="async"
+    fetchpriority="high"
+  />
+  <span class="ollie-sprite" aria-hidden="true"></span>
+</button>
+
+<script>
+  import { ollieFrames } from "../lib/ollie-animation";
+
+  // Keep the visitor's pause choice and place in the loop across Astro swaps.
+  let manuallyPaused = false;
+  let frameIndex = 0;
+  let cleanup: (() => void) | undefined;
+
+  function setupOllie() {
+    cleanup?.();
+    const button = document.querySelector<HTMLButtonElement>(
+      "[data-ollie-avatar]",
+    );
+    const sprite = button?.querySelector<HTMLElement>(".ollie-sprite");
+    const source = button?.dataset.atlas;
+    if (!button || !sprite || !source) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const image = new Image();
+    let timer: number | undefined;
+    let inViewport = false;
+    let loaded = false;
+    let loading = false;
+    let disposed = false;
+
+    function paint() {
+      const frame = ollieFrames[frameIndex]!;
+      sprite!.style.backgroundPosition = `${(frame.column * 100) / 7}% ${frame.row * 10}%`;
+      button!.dataset.animation = frame.animation;
+      button!.dataset.frame = `${frame.row}:${frame.column}`;
+    }
+
+    function canPlay() {
+      return (
+        !disposed &&
+        loaded &&
+        inViewport &&
+        !document.hidden &&
+        !reducedMotion.matches &&
+        !manuallyPaused
+      );
+    }
+
+    function schedule() {
+      if (!canPlay() || timer !== undefined) return;
+      button!.dataset.playing = "true";
+      timer = window.setTimeout(() => {
+        timer = undefined;
+        if (!canPlay()) return;
+        frameIndex = (frameIndex + 1) % ollieFrames.length;
+        paint();
+        schedule();
+      }, ollieFrames[frameIndex]!.duration);
+    }
+
+    function syncPlayback() {
+      window.clearTimeout(timer);
+      timer = undefined;
+      button!.dataset.playing = "false";
+      button!.dataset.paused = String(manuallyPaused);
+      button!.disabled = reducedMotion.matches || !loaded;
+      const label = button!.disabled
+        ? "Ollie"
+        : manuallyPaused
+          ? "Resume Ollie's animations"
+          : "Pause Ollie's animations";
+      button!.setAttribute("aria-label", label);
+      button!.title = label;
+
+      // Reduced motion and no-JS visitors only need the small still image.
+      if (!reducedMotion.matches && !loaded && !loading) {
+        loading = true;
+        image.src = source!;
+      }
+      schedule();
+    }
+
+    image.onload = () => {
+      if (disposed) return;
+      loaded = true;
+      sprite.style.backgroundImage = `url("${source}")`;
+      button.dataset.ready = "true";
+      paint();
+      syncPlayback();
+    };
+    image.onerror = () => {
+      if (disposed) return;
+      button.disabled = true;
+      button.title = "Ollie";
+      button.setAttribute("aria-label", "Ollie");
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      inViewport = entry?.isIntersecting ?? false;
+      syncPlayback();
+    });
+    const togglePlayback = () => {
+      manuallyPaused = !manuallyPaused;
+      syncPlayback();
+    };
+    button.addEventListener("click", togglePlayback);
+    document.addEventListener("visibilitychange", syncPlayback);
+    reducedMotion.addEventListener("change", syncPlayback);
+    observer.observe(button);
+    paint();
+    syncPlayback();
+
+    cleanup = () => {
+      disposed = true;
+      window.clearTimeout(timer);
+      observer.disconnect();
+      image.onload = null;
+      image.onerror = null;
+      button.removeEventListener("click", togglePlayback);
+      document.removeEventListener("visibilitychange", syncPlayback);
+      reducedMotion.removeEventListener("change", syncPlayback);
+    };
+  }
+
+  document.addEventListener("astro:page-load", setupOllie);
+  document.addEventListener("astro:before-swap", () => {
+    cleanup?.();
+    cleanup = undefined;
+  });
+</script>
+
+<style>
+  .ollie-avatar {
+    position: relative;
+    display: block;
+    width: 4.5rem;
+    aspect-ratio: 12 / 13;
+    flex: 0 0 4.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0.35rem;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ollie-avatar:disabled {
+    cursor: default;
+  }
+
+  .ollie-still,
+  .ollie-sprite {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  .ollie-sprite {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+    background-repeat: no-repeat;
+    background-size: 800% 1100%;
+  }
+
+  .ollie-avatar[data-ready="true"] .ollie-still {
+    visibility: hidden;
+  }
+
+  .ollie-avatar[data-ready="true"] .ollie-sprite {
+    visibility: visible;
+  }
+
+  .ollie-avatar[data-paused="true"]:not(:disabled)::after {
+    position: absolute;
+    right: 0;
+    bottom: 0.1rem;
+    width: 0.35rem;
+    height: 0.45rem;
+    border-inline: 2px solid currentColor;
+    content: "";
+  }
+
+  @media (max-width: 30em) {
+    .ollie-avatar {
+      width: 3.75rem;
+      flex-basis: 3.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ollie-avatar[data-ready="true"] .ollie-still {
+      visibility: visible;
+    }
+
+    .ollie-avatar[data-ready="true"] .ollie-sprite {
+      visibility: hidden;
+    }
+  }
+</style>

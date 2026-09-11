@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "@components/ThemeToggle.astro";
+import OllieAvatar from "@components/OllieAvatar.astro";
 import {
   author,
   blogMeta,
@@ -97,12 +98,6 @@ const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
       type="font/woff2"
       crossorigin
     />
-    <link
-      rel="preload"
-      href="/octopus-transparent.png"
-      as="image"
-      fetchpriority="high"
-    />
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light dark" />
@@ -175,16 +170,7 @@ const commitUrl = commitSha ? `${repo}/commit/${commitSha}` : repo;
                 </a>
               )
             }
-            <span class="avatar" aria-hidden="true">
-              <img
-                class="avatar-image"
-                src="/octopus-transparent.png"
-                alt=""
-                width="64"
-                height="64"
-                decoding="async"
-              />
-            </span>
+            <OllieAvatar />
           </div>
           <ul class="site-actions">
             {

@@ -62,7 +62,7 @@
   --text-sm: 0.9375rem;
   --text-base: 1.0625rem;
   --text-body: clamp(1.0625rem, 0.35vw + 0.98rem, 1.1875rem);
-  --text-brand: 1.5em;
+  --text-brand: 1.75em;
   --text-section: 1.1em;
   --page-width: 42rem;
   --page-gutter: 1.25rem;
