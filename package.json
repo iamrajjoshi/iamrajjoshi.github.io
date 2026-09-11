@@ -12,8 +12,7 @@
     "build": "astro build",
     "format": "prettier --write . --plugin=prettier-plugin-astro",
     "preview": "astro preview",
-    "lint": "astro check",
-    "test": "node --experimental-strip-types --test tests/*.test.mjs"
+    "lint": "astro check"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

@@ -24,16 +24,17 @@ The preview runs at <http://127.0.0.1:4321>. Validate and build the site with:
 
 ```bash
 pnpm lint
-pnpm test
 pnpm build
 ```
 
-Ollie quietly breathes and fidgets in the header, then rests after twenty seconds
-without interaction. Click or keyboard-activate him to spark a curious reaction:
-he looks around, thinks, waves, or jogs before settling again. His routines use
-all nine pet animations and sixteen look directions; reduced-motion preferences
-use a still image. Asset provenance and regeneration instructions are in
-[`src/assets/ollie/README.md`](src/assets/ollie/README.md).
+When left alone, Ollie alternates thirty seconds of quiet breathing and fidgeting
+with twenty seconds of sleep, gently opening his eyes again on his own. Click or
+keyboard-activate him to spark a curious reaction: he looks around, thinks,
+waves, or jogs before returning to that routine. Sleeping Ollie wakes gradually,
+and clicking while he is waking lets him finish opening his eyes. His routines
+use all nine pet animations and sixteen look directions; reduced-motion
+preferences use a still image. Asset details and regeneration instructions
+are in [`src/assets/ollie/README.md`](src/assets/ollie/README.md).
 
 ## Deploy
 

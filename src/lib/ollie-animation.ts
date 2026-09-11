@@ -43,9 +43,9 @@ function clip(animation: AnimationName, duration: number, loops = 1) {
 // A quiet companion: little movements separated by comfortable stillness.
 const idle = [
   ...clip("idle", 240),
-  pose("idle", 6, 5000),
+  pose("idle", 6, 10_000),
   ...clip("waiting", 320),
-  pose("idle", 0, 6000),
+  pose("idle", 0, 12_000),
 ];
 const resting = [
   pose("failed", 2, 550),
@@ -98,15 +98,9 @@ const reactions = [
   ],
 ];
 
-export const REST_AFTER_MS = 20_000;
+export const REST_AFTER_MS = 30_000;
+export const REST_FOR_MS = 20_000;
 export const REACTION_COOLDOWN_MS = 750;
-export const ollieFrames: readonly OllieFrame[] = [
-  ...idle,
-  ...resting,
-  ...waking,
-  ...reactions.flat(),
-];
-
 function duration(frames: readonly OllieFrame[]) {
   return frames.reduce((total, frame) => total + frame.duration, 0);
 }
@@ -114,6 +108,7 @@ function duration(frames: readonly OllieFrame[]) {
 const idleDuration = duration(idle);
 const restingDuration = duration(resting);
 const wakingDuration = duration(waking);
+const quietCycleDuration = REST_AFTER_MS + REST_FOR_MS;
 
 function sampleFrames(frames: readonly OllieFrame[], elapsed: number) {
   let remaining = Math.max(0, elapsed);
@@ -124,6 +119,31 @@ function sampleFrames(frames: readonly OllieFrame[], elapsed: number) {
     remaining -= frame.duration;
   }
   return { frame: frames[frames.length - 1]!, delay: 1 };
+}
+
+function quietPhase(elapsed: number) {
+  const time = Math.max(0, elapsed);
+  const phase = time % quietCycleDuration;
+  return {
+    phase,
+    sleeping: phase >= REST_AFTER_MS,
+    waking: time >= quietCycleDuration && phase < wakingDuration,
+    awakeElapsed: phase - (time >= quietCycleDuration ? wakingDuration : 0),
+  };
+}
+
+function remainingWake(elapsed: number) {
+  let remaining = elapsed;
+  for (const [index, frame] of waking.entries()) {
+    if (remaining < frame.duration) {
+      return [
+        { ...frame, duration: frame.duration - remaining },
+        ...waking.slice(index + 1),
+      ];
+    }
+    remaining -= frame.duration;
+  }
+  return [];
 }
 
 export function createOllieBehavior(now = Date.now()) {
@@ -145,15 +165,17 @@ export function createOllieBehavior(now = Date.now()) {
         reactionStartedAt === undefined
           ? idleSince
           : reactionStartedAt + reactionDuration;
-      const wasResting = now - quietSince >= REST_AFTER_MS;
+      const quiet = quietPhase(now - quietSince);
+      const needsWake = quiet.sleeping || quiet.waking;
+      const wakeElapsed = quiet.waking ? quiet.phase : 0;
       lastClickAt = now;
       // A sleepy Ollie always wakes gently; playfulness comes with more attention.
-      reactionIndex = wasResting ? 0 : (reactionIndex + 1) % reactions.length;
-      reactionFrames = wasResting
-        ? [...waking, ...reactions[reactionIndex]!]
+      reactionIndex = needsWake ? 0 : (reactionIndex + 1) % reactions.length;
+      reactionFrames = needsWake
+        ? [...remainingWake(wakeElapsed), ...reactions[reactionIndex]!]
         : reactions[reactionIndex]!;
       reactionDuration = duration(reactionFrames);
-      wakingUntil = wasResting ? now + wakingDuration : -Infinity;
+      wakingUntil = needsWake ? now + wakingDuration - wakeElapsed : -Infinity;
       reactionStartedAt = now;
       return true;
     },
@@ -171,20 +193,25 @@ export function createOllieBehavior(now = Date.now()) {
       }
 
       // Wall time lets Ollie settle while the tab or header is out of sight.
-      const quietTime = Math.max(0, now - idleSince);
-      if (quietTime >= REST_AFTER_MS) {
+      const quiet = quietPhase(now - idleSince);
+      if (quiet.sleeping) {
+        const sample = sampleFrames(
+          resting,
+          (quiet.phase - REST_AFTER_MS) % restingDuration,
+        );
         return {
-          ...sampleFrames(
-            resting,
-            (quietTime - REST_AFTER_MS) % restingDuration,
-          ),
+          ...sample,
+          delay: Math.min(sample.delay, quietCycleDuration - quiet.phase),
           mood: "resting" as const,
         };
       }
-      const sample = sampleFrames(idle, quietTime % idleDuration);
+      // Open his eyes on his own, then spend most of the awake phase standing still.
+      const sample = quiet.waking
+        ? sampleFrames(waking, quiet.phase)
+        : sampleFrames(idle, quiet.awakeElapsed % idleDuration);
       return {
         ...sample,
-        delay: Math.min(sample.delay, REST_AFTER_MS - quietTime),
+        delay: Math.min(sample.delay, REST_AFTER_MS - quiet.phase),
         mood: "idle" as const,
       };
     },
