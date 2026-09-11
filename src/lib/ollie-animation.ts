@@ -42,42 +42,42 @@ function clip(animation: AnimationName, duration: number, loops = 1) {
 
 // A quiet companion: little movements separated by comfortable stillness.
 const idle = [
-  ...clip("idle", 180),
-  pose("idle", 6, 4000),
-  ...clip("waiting", 230),
-  pose("idle", 0, 5000),
+  ...clip("idle", 240),
+  pose("idle", 6, 5000),
+  ...clip("waiting", 320),
+  pose("idle", 0, 6000),
 ];
 const resting = [
-  pose("failed", 2, 400),
-  pose("failed", 3, 2800),
-  pose("failed", 4, 2800),
-  pose("failed", 3, 2800),
+  pose("failed", 2, 550),
+  pose("failed", 3, 3600),
+  pose("failed", 4, 3600),
+  pose("failed", 3, 3600),
 ];
 
 // Each click tells a short story, then Ollie returns to his own quiet routine.
 const reactions = [
   [
-    ...clip("jumping", 100),
-    ...clip("look-around", 120),
-    ...clip("review", 170),
-    ...clip("waving", 160),
-    ...clip("idle", 150),
+    ...clip("jumping", 140),
+    ...clip("look-around", 250),
+    ...clip("review", 230),
+    ...clip("waving", 220),
+    ...clip("idle", 210),
   ],
   [
-    ...clip("waving", 140),
-    ...clip("running-right", 100, 2),
-    ...clip("running-left", 100, 2),
-    ...clip("jumping", 120),
-    ...clip("waving", 160),
-    ...clip("idle", 150),
+    ...clip("waving", 200),
+    ...clip("running-right", 140, 2),
+    ...clip("running-left", 140, 2),
+    ...clip("jumping", 170),
+    ...clip("waving", 220),
+    ...clip("idle", 210),
   ],
   [
-    ...clip("failed", 140),
-    ...clip("look-around", 100),
-    ...clip("review", 170),
-    ...clip("working", 160),
-    ...clip("waving", 160),
-    ...clip("idle", 150),
+    ...clip("failed", 190),
+    ...clip("look-around", 250),
+    ...clip("review", 230),
+    ...clip("working", 220),
+    ...clip("waving", 220),
+    ...clip("idle", 210),
   ],
 ];
 

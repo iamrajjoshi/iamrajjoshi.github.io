@@ -23,7 +23,7 @@ function sampleFrames(behavior, start, end) {
 
 function finishReaction(behavior, start) {
   const frames = [];
-  for (let now = start; now < start + 10_000;) {
+  for (let now = start; now < start + 12_000;) {
     const sample = behavior.sample(now);
     if (sample.mood !== "reacting") {
       assert.equal(sample.mood, "idle");
@@ -33,7 +33,7 @@ function finishReaction(behavior, start) {
     frames.push(sample.frame);
     now += Math.max(1, sample.delay);
   }
-  assert.fail("A click reaction must settle within ten seconds");
+  assert.fail("A click reaction must settle within twelve seconds");
 }
 
 test("plays every frame of all nine standard animations", () => {
