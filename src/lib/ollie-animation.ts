@@ -53,20 +53,37 @@ const resting = [
   pose("failed", 4, 3600),
   pose("failed", 3, 3600),
 ];
+const waking = [
+  pose("failed", 4, 450),
+  pose("failed", 3, 400),
+  pose("failed", 2, 350),
+  pose("failed", 1, 300),
+  pose("failed", 0, 300),
+  pose("idle", 0, 350),
+];
 
 // Each click tells a short story, then Ollie returns to his own quiet routine.
 const reactions = [
   [
-    ...clip("jumping", 140),
-    ...clip("look-around", 250),
+    // Get his bearings with small side glances and a moment to focus.
+    pose("look-around", 0, 400),
+    pose("look-around", 1, 250),
+    pose("look-around", 2, 450),
+    pose("look-around", 1, 250),
+    pose("look-around", 0, 300),
+    pose("look-around", 15, 250),
+    pose("look-around", 14, 450),
+    pose("look-around", 15, 250),
+    pose("look-around", 0, 400),
     ...clip("review", 230),
     ...clip("waving", 220),
     ...clip("idle", 210),
   ],
   [
     ...clip("waving", 200),
-    ...clip("running-right", 140, 2),
-    ...clip("running-left", 140, 2),
+    ...clip("running-right", 140),
+    pose("idle", 0, 300),
+    ...clip("running-left", 140),
     ...clip("jumping", 170),
     ...clip("waving", 220),
     ...clip("idle", 210),
@@ -86,6 +103,7 @@ export const REACTION_COOLDOWN_MS = 750;
 export const ollieFrames: readonly OllieFrame[] = [
   ...idle,
   ...resting,
+  ...waking,
   ...reactions.flat(),
 ];
 
@@ -95,7 +113,7 @@ function duration(frames: readonly OllieFrame[]) {
 
 const idleDuration = duration(idle);
 const restingDuration = duration(resting);
-const reactionDurations = reactions.map(duration);
+const wakingDuration = duration(waking);
 
 function sampleFrames(frames: readonly OllieFrame[], elapsed: number) {
   let remaining = Math.max(0, elapsed);
@@ -112,24 +130,39 @@ export function createOllieBehavior(now = Date.now()) {
   let idleSince = now;
   let reactionStartedAt: number | undefined;
   let reactionIndex = -1;
+  let reactionFrames: readonly OllieFrame[] = [];
+  let reactionDuration = 0;
+  let wakingUntil = -Infinity;
   let lastClickAt = -Infinity;
 
   return {
     react(now: number) {
       // Coalesce double clicks; accepted clicks replace a reaction, never queue it.
-      if (now - lastClickAt < REACTION_COOLDOWN_MS) return false;
+      if (now < wakingUntil || now - lastClickAt < REACTION_COOLDOWN_MS) {
+        return false;
+      }
+      const quietSince =
+        reactionStartedAt === undefined
+          ? idleSince
+          : reactionStartedAt + reactionDuration;
+      const wasResting = now - quietSince >= REST_AFTER_MS;
       lastClickAt = now;
-      reactionIndex = (reactionIndex + 1) % reactions.length;
+      // A sleepy Ollie always wakes gently; playfulness comes with more attention.
+      reactionIndex = wasResting ? 0 : (reactionIndex + 1) % reactions.length;
+      reactionFrames = wasResting
+        ? [...waking, ...reactions[reactionIndex]!]
+        : reactions[reactionIndex]!;
+      reactionDuration = duration(reactionFrames);
+      wakingUntil = wasResting ? now + wakingDuration : -Infinity;
       reactionStartedAt = now;
       return true;
     },
     sample(now: number) {
       if (reactionStartedAt !== undefined) {
         const elapsed = Math.max(0, now - reactionStartedAt);
-        const reactionDuration = reactionDurations[reactionIndex]!;
         if (elapsed < reactionDuration) {
           return {
-            ...sampleFrames(reactions[reactionIndex]!, elapsed),
+            ...sampleFrames(reactionFrames, elapsed),
             mood: "reacting" as const,
           };
         }

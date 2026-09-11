@@ -23,7 +23,7 @@ function sampleFrames(behavior, start, end) {
 
 function finishReaction(behavior, start) {
   const frames = [];
-  for (let now = start; now < start + 12_000;) {
+  for (let now = start; now < start + 14_000;) {
     const sample = behavior.sample(now);
     if (sample.mood !== "reacting") {
       assert.equal(sample.mood, "idle");
@@ -33,7 +33,7 @@ function finishReaction(behavior, start) {
     frames.push(sample.frame);
     now += Math.max(1, sample.delay);
   }
-  assert.fail("A click reaction must settle within twelve seconds");
+  assert.fail("A click reaction must settle within fourteen seconds");
 }
 
 test("plays every frame of all nine standard animations", () => {
@@ -54,9 +54,18 @@ test("looks around all sixteen directions in clockwise order", () => {
   const frames = ollieFrames.filter(
     (frame) => frame.animation === "look-around",
   );
-  assert.deepEqual(
-    frames.slice(0, 16).map(({ row, column }) => [row, column]),
-    Array.from({ length: 16 }, (_, i) => [9 + Math.floor(i / 8), i % 8]),
+  const fullTurn = Array.from(
+    { length: 16 },
+    (_, i) => `${9 + Math.floor(i / 8)}:${i % 8}`,
+  );
+  assert.ok(
+    frames.some((_, start) =>
+      fullTurn.every((key, offset) => {
+        const frame = frames[start + offset];
+        return frame && frameKey(frame) === key;
+      }),
+    ),
+    "A complete clockwise look remains reachable alongside short side glances",
   );
 });
 
@@ -76,7 +85,7 @@ test("unprompted routines stay calm instead of launching click reactions", () =>
   assert.ok(frames.every((frame) => calmAnimations.has(frame.animation)));
 });
 
-test("a click wakes Ollie immediately, then he settles and rests again", () => {
+test("a click starts waking Ollie, then he settles and rests again", () => {
   const behavior = createOllieBehavior(0);
   const clickedAt = REST_AFTER_MS + 5_000;
   assert.equal(behavior.sample(clickedAt).mood, "resting");
@@ -85,6 +94,56 @@ test("a click wakes Ollie immediately, then he settles and rests again", () => {
   const { end } = finishReaction(behavior, clickedAt);
   assert.equal(behavior.sample(end + REST_AFTER_MS - 1).mood, "idle");
   assert.equal(behavior.sample(end + REST_AFTER_MS).mood, "resting");
+});
+
+test("sleeping Ollie opens his eyes gradually before starting a reaction", () => {
+  const behavior = createOllieBehavior(0);
+  const clickedAt = REST_AFTER_MS;
+  assert.equal(behavior.react(clickedAt), true);
+
+  // Start with the existing closed-eye artwork, then gradually open the eyes.
+  assert.equal(frameKey(behavior.sample(clickedAt).frame), "5:4");
+  assert.equal(frameKey(behavior.sample(clickedAt + 449).frame), "5:4");
+  assert.equal(frameKey(behavior.sample(clickedAt + 1_200).frame), "5:1");
+  assert.equal(behavior.sample(clickedAt + 2_149).frame.animation, "idle");
+  assert.equal(frameKey(behavior.sample(clickedAt + 2_150).frame), "9:0");
+});
+
+test("already-awake Ollie reacts immediately without the sleepy prelude", () => {
+  const behavior = createOllieBehavior(0);
+  const clickedAt = REST_AFTER_MS - 1;
+  assert.equal(behavior.react(clickedAt), true);
+  assert.equal(frameKey(behavior.sample(clickedAt).frame), "9:0");
+});
+
+test("after sleeping Ollie returns to curiosity instead of the next energetic story", () => {
+  const behavior = createOllieBehavior(0);
+  behavior.react(0);
+  const first = finishReaction(behavior, 0);
+  const nextClick = first.end + 1_000;
+  behavior.react(nextClick);
+  assert.equal(behavior.sample(nextClick).frame.animation, "waving");
+  const second = finishReaction(behavior, nextClick);
+
+  const wakeAt = second.end + REST_AFTER_MS;
+  assert.equal(behavior.react(wakeAt), true);
+  assert.equal(frameKey(behavior.sample(wakeAt).frame), "5:4");
+  assert.equal(frameKey(behavior.sample(wakeAt + 2_150).frame), "9:0");
+});
+
+test("extra clicks cannot interrupt Ollie's gentle wake-up", () => {
+  const behavior = createOllieBehavior(0);
+  const reference = createOllieBehavior(0);
+  const clickedAt = REST_AFTER_MS;
+  behavior.react(clickedAt);
+  reference.react(clickedAt);
+  for (const elapsed of [50, 750, 1_200, 2_149]) {
+    const now = clickedAt + elapsed;
+    assert.equal(behavior.react(now), false);
+    assert.deepEqual(behavior.sample(now), reference.sample(now));
+  }
+  assert.equal(behavior.react(clickedAt + 2_150), true);
+  assert.equal(behavior.sample(clickedAt + 2_150).frame.animation, "waving");
 });
 
 test("rapid clicks are coalesced without altering or queuing the reaction", () => {
@@ -111,7 +170,7 @@ test("clicks rotate three distinct bounded reactions", () => {
     assert.equal(behavior.react(now), true);
     const { end, frames } = finishReaction(behavior, now);
     stories.push(frames.map(frameKey).join(","));
-    now = end + REST_AFTER_MS;
+    now = end + 1_000;
   }
   assert.equal(new Set(stories.slice(0, 3)).size, 3);
   assert.equal(stories[3], stories[0]);
@@ -126,6 +185,14 @@ test("returning after a long hidden interval resumes a resting pet", () => {
   assert.equal(behavior.sample(now).mood, "reacting");
 });
 
+test("a hidden interval still requires gentle waking without intermediate samples", () => {
+  const behavior = createOllieBehavior(0);
+  behavior.react(0);
+  const returnedAt = 60_000;
+  assert.equal(behavior.react(returnedAt), true);
+  assert.equal(frameKey(behavior.sample(returnedAt).frame), "5:4");
+});
+
 test("idle, rest, and actual click reactions reach the complete frame inventory", () => {
   const behavior = createOllieBehavior(0);
   const seen = new Set(
@@ -136,7 +203,7 @@ test("idle, rest, and actual click reactions reach the complete frame inventory"
     assert.equal(behavior.react(now), true);
     const { end, frames } = finishReaction(behavior, now);
     for (const frame of frames) seen.add(frameKey(frame));
-    now = end + REST_AFTER_MS;
+    now = end + 1_000;
   }
   assert.deepEqual(
     [...seen].sort(),
