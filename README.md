@@ -28,10 +28,12 @@ pnpm test
 pnpm build
 ```
 
-Ollie’s header animation cycles through all nine pet animations and sixteen look
-directions. Click or keyboard-activate Ollie to pause or resume; reduced-motion
-preferences use a still image. Asset provenance and regeneration instructions
-are in [`src/assets/ollie/README.md`](src/assets/ollie/README.md).
+Ollie quietly breathes and fidgets in the header, then rests after twenty seconds
+without interaction. Click or keyboard-activate him to spark a curious reaction:
+he looks around, thinks, waves, or jogs before settling again. His routines use
+all nine pet animations and sixteen look directions; reduced-motion preferences
+use a still image. Asset provenance and regeneration instructions are in
+[`src/assets/ollie/README.md`](src/assets/ollie/README.md).
 
 ## Deploy
 

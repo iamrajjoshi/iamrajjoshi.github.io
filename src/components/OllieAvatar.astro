@@ -26,11 +26,10 @@ import still from "~/assets/ollie/still.webp";
 </button>
 
 <script>
-  import { ollieFrames } from "../lib/ollie-animation";
+  import { createOllieBehavior } from "../lib/ollie-animation";
 
-  // Keep the visitor's pause choice and place in the loop across Astro swaps.
-  let manuallyPaused = false;
-  let frameIndex = 0;
+  // Ollie's mood and time without attention survive navigation between pages.
+  const behavior = createOllieBehavior();
   let cleanup: (() => void) | undefined;
 
   function setupOllie() {
@@ -51,10 +50,12 @@ import still from "~/assets/ollie/still.webp";
     let disposed = false;
 
     function paint() {
-      const frame = ollieFrames[frameIndex]!;
+      const { frame, mood, delay } = behavior.sample(Date.now());
       sprite!.style.backgroundPosition = `${(frame.column * 100) / 7}% ${frame.row * 10}%`;
       button!.dataset.animation = frame.animation;
       button!.dataset.frame = `${frame.row}:${frame.column}`;
+      button!.dataset.mood = mood;
+      return delay;
     }
 
     function canPlay() {
@@ -63,34 +64,27 @@ import still from "~/assets/ollie/still.webp";
         loaded &&
         inViewport &&
         !document.hidden &&
-        !reducedMotion.matches &&
-        !manuallyPaused
+        !reducedMotion.matches
       );
     }
 
     function schedule() {
       if (!canPlay() || timer !== undefined) return;
+      const delay = paint();
       button!.dataset.playing = "true";
       timer = window.setTimeout(() => {
         timer = undefined;
         if (!canPlay()) return;
-        frameIndex = (frameIndex + 1) % ollieFrames.length;
-        paint();
         schedule();
-      }, ollieFrames[frameIndex]!.duration);
+      }, delay);
     }
 
     function syncPlayback() {
       window.clearTimeout(timer);
       timer = undefined;
       button!.dataset.playing = "false";
-      button!.dataset.paused = String(manuallyPaused);
       button!.disabled = reducedMotion.matches || !loaded;
-      const label = button!.disabled
-        ? "Ollie"
-        : manuallyPaused
-          ? "Resume Ollie's animations"
-          : "Pause Ollie's animations";
+      const label = button!.disabled ? "Ollie" : "Say hi to Ollie";
       button!.setAttribute("aria-label", label);
       button!.title = label;
 
@@ -121,11 +115,11 @@ import still from "~/assets/ollie/still.webp";
       inViewport = entry?.isIntersecting ?? false;
       syncPlayback();
     });
-    const togglePlayback = () => {
-      manuallyPaused = !manuallyPaused;
+    const greetOllie = () => {
+      if (!behavior.react(Date.now())) return;
       syncPlayback();
     };
-    button.addEventListener("click", togglePlayback);
+    button.addEventListener("click", greetOllie);
     document.addEventListener("visibilitychange", syncPlayback);
     reducedMotion.addEventListener("change", syncPlayback);
     observer.observe(button);
@@ -138,7 +132,7 @@ import still from "~/assets/ollie/still.webp";
       observer.disconnect();
       image.onload = null;
       image.onerror = null;
-      button.removeEventListener("click", togglePlayback);
+      button.removeEventListener("click", greetOllie);
       document.removeEventListener("visibilitychange", syncPlayback);
       reducedMotion.removeEventListener("change", syncPlayback);
     };
@@ -193,16 +187,6 @@ import still from "~/assets/ollie/still.webp";
 
   .ollie-avatar[data-ready="true"] .ollie-sprite {
     visibility: visible;
-  }
-
-  .ollie-avatar[data-paused="true"]:not(:disabled)::after {
-    position: absolute;
-    right: 0;
-    bottom: 0.1rem;
-    width: 0.35rem;
-    height: 0.45rem;
-    border-inline: 2px solid currentColor;
-    content: "";
   }
 
   @media (max-width: 30em) {
