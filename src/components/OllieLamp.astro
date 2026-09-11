@@ -1,0 +1,201 @@
+<span class="ollie-lamp-cone" aria-hidden="true"></span>
+<svg
+  class="ollie-lamp-scene"
+  viewBox="0 0 96 104"
+  aria-hidden="true"
+  focusable="false"
+  shape-rendering="crispEdges"
+>
+  <g class="lamp-cord" fill="#c8b788">
+    <path class="lamp-cord-suspension" d="M87-60h2v31h-2z"></path>
+    <path class="lamp-cord-line" d="M87-29h2v58h-2z"></path>
+    <g class="lamp-cord-knob">
+      <path fill="#8f724a" d="M85 28h6v8h-6z"></path>
+      <path fill="#dfc38c" d="M86 29h4v6h-4z"></path>
+      <path fill="#fff0bf" d="M86 29h2v3h-2z"></path>
+    </g>
+  </g>
+  <g class="lamp-fixture">
+    <path fill="#080908" d="M42-58h14v13H42z"></path>
+    <path fill="#55574e" d="M45-55h4v8h-4z"></path>
+    <path fill="#090a09" d="M36-49h26v5h6v7h6v8h5v6h3v5H16v-5h3v-6h5v-8h6v-7h6z"
+    ></path>
+    <path fill="#393b32" d="M36-47h8v5h-6v7h-6v8h-5v5h-7v-6h5v-8h6v-7h5z"
+    ></path>
+    <path fill="#686b5e" d="M32-39h5v3h-5zM26-31h5v3h-5z"></path>
+    <path fill="#252721" d="M58-47h4v5h6v7h6v8h4v4h-6v-7h-5v-8h-5v-6h-4z"
+    ></path>
+    <path fill="#080908" d="M18-25h62v7H18z"></path>
+    <path class="lamp-rim" fill="#777a70" d="M21-24h56v4H21z"></path>
+    <path class="lamp-bulb" fill="#acafa0" d="M39-23h20v3H39z"></path>
+    <path fill="none" stroke="#c8b788" stroke-width="1.5" d="M73-31Q88-35 88-29"
+    ></path>
+  </g>
+</svg>
+
+<style>
+  .ollie-lamp-scene,
+  .ollie-lamp-cone {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .ollie-lamp-scene {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: 3;
+  }
+
+  .ollie-lamp-cone {
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 700ms ease;
+    left: -27%;
+    top: -19.23%;
+    width: 156%;
+    height: 120%;
+    clip-path: polygon(31.3% 0, 68.7% 0, 100% 100%, 0 100%);
+    background: linear-gradient(
+      to bottom,
+      rgb(255 218 150 / 34%),
+      rgb(255 207 126 / 22%) 32%,
+      rgb(255 197 107 / 9%) 78%,
+      transparent
+    );
+  }
+
+  .lamp-cord {
+    opacity: 0;
+    transform: translateY(-62px);
+    transition:
+      opacity 180ms ease,
+      transform 0s 180ms;
+  }
+
+  :global([data-lamp-phase="cord"]) .lamp-cord {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      transform 820ms cubic-bezier(0.22, 0.7, 0.2, 1),
+      opacity 180ms ease;
+  }
+
+  :global([data-lamp-phase="notice"]) .lamp-cord,
+  :global([data-lamp-phase="reach"]) .lamp-cord,
+  :global([data-lamp-phase="pull"]) .lamp-cord,
+  :global([data-lamp-phase="descend"]) .lamp-cord,
+  :global([data-lamp-phase="release"]) .lamp-cord,
+  :global([data-lamp-phase="lit"]) .lamp-cord,
+  :global([data-lamp-phase="extinguish"]) .lamp-cord,
+  :global([data-lamp-phase="dim"]) .lamp-cord {
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
+  }
+
+  .lamp-cord-suspension {
+    opacity: 1;
+    transition: opacity 600ms ease;
+  }
+
+  :global([data-lamp-phase="descend"]) .lamp-cord-suspension,
+  :global([data-lamp-phase="release"]) .lamp-cord-suspension,
+  :global([data-lamp-phase="lit"]) .lamp-cord-suspension,
+  :global([data-lamp-phase="extinguish"]) .lamp-cord-suspension,
+  :global([data-lamp-phase="dim"]) .lamp-cord-suspension,
+  :global([data-lamp-phase="depart"]) .lamp-cord-suspension {
+    opacity: 0;
+  }
+
+  .lamp-fixture {
+    opacity: 0;
+    transform: translateY(-38px);
+    transition:
+      opacity 220ms ease,
+      transform 0s 220ms;
+  }
+
+  :global([data-lamp-phase="descend"]) .lamp-fixture {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      transform 800ms cubic-bezier(0.2, 0.75, 0.22, 1),
+      opacity 260ms ease;
+  }
+
+  :global([data-lamp-phase="release"]) .lamp-fixture,
+  :global([data-lamp-phase="lit"]) .lamp-fixture,
+  :global([data-lamp-phase="extinguish"]) .lamp-fixture,
+  :global([data-lamp-phase="dim"]) .lamp-fixture {
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
+  }
+
+  :global([data-lamp-phase="depart"]) .lamp-fixture,
+  :global([data-lamp-phase="depart"]) .lamp-cord {
+    opacity: 0;
+    transform: translateY(-38px);
+    transition:
+      transform 900ms cubic-bezier(0.4, 0, 0.3, 1),
+      opacity 650ms ease 150ms;
+  }
+
+  .lamp-cord-line {
+    transform-origin: 88px -29px;
+    transition: transform 300ms ease-out;
+  }
+
+  .lamp-cord-knob {
+    transition: transform 300ms ease-out;
+  }
+
+  :global([data-lamp-phase="pull"]) .lamp-cord-line,
+  :global([data-lamp-phase="extinguish"]) .lamp-cord-line {
+    transform: scaleY(1.12);
+    transition-duration: 220ms;
+    transition-timing-function: ease-in;
+  }
+
+  :global([data-lamp-phase="pull"]) .lamp-cord-knob,
+  :global([data-lamp-phase="extinguish"]) .lamp-cord-knob {
+    transform: translateY(7px);
+    transition-duration: 220ms;
+    transition-timing-function: ease-in;
+  }
+
+  .lamp-bulb,
+  .lamp-rim {
+    transition: fill 500ms ease;
+  }
+
+  :global([data-lamp-phase="release"]) .lamp-bulb,
+  :global([data-lamp-phase="lit"]) .lamp-bulb {
+    fill: #ffe6a5;
+  }
+
+  :global([data-lamp-phase="release"]) .lamp-rim,
+  :global([data-lamp-phase="lit"]) .lamp-rim {
+    fill: #edc17b;
+  }
+
+  :global([data-lamp-phase="release"]) .ollie-lamp-cone,
+  :global([data-lamp-phase="lit"]) .ollie-lamp-cone {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ollie-lamp-cone,
+    .lamp-cord,
+    .lamp-cord-suspension,
+    .lamp-fixture,
+    .lamp-cord-line,
+    .lamp-cord-knob,
+    .lamp-bulb,
+    .lamp-rim {
+      transition: none !important;
+    }
+  }
+</style>

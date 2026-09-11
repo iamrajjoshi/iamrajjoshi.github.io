@@ -3,6 +3,19 @@ export interface OllieFrame {
   row: number;
   column: number;
   duration: number;
+  lampPhase?:
+    | "off"
+    | "cord"
+    | "notice"
+    | "reach"
+    | "pull"
+    | "descend"
+    | "release"
+    | "lit"
+    | "extinguish"
+    | "dim"
+    | "depart";
+  sunglassesPhase?: "off" | "fetch" | "lift" | "wear" | "lower" | "stow";
 }
 
 const animations = {
@@ -98,6 +111,37 @@ const reactions = [
   ],
 ];
 
+// Both theme scenes last 12 seconds, with room to enjoy the prop before putting it away.
+const lampPull: readonly OllieFrame[] = [
+  { ...pose("idle", 0, 900), lampPhase: "cord" },
+  { ...pose("waiting", 0, 380), lampPhase: "notice" },
+  { ...pose("waiting", 1, 360), lampPhase: "notice" },
+  { ...pose("waving", 0, 280), lampPhase: "reach" },
+  { ...pose("waving", 2, 400), lampPhase: "reach" },
+  { ...pose("waving", 1, 480), lampPhase: "pull" },
+  { ...pose("waving", 2, 800), lampPhase: "descend" },
+  { ...pose("waving", 0, 440), lampPhase: "release" },
+  { ...pose("waving", 0, 320), lampPhase: "lit" },
+  { ...pose("idle", 0, 4620), lampPhase: "lit" },
+  { ...pose("waving", 0, 280), lampPhase: "lit" },
+  { ...pose("waving", 2, 400), lampPhase: "lit" },
+  { ...pose("waving", 1, 480), lampPhase: "extinguish" },
+  { ...pose("waving", 2, 360), lampPhase: "dim" },
+  { ...pose("waving", 0, 350), lampPhase: "depart" },
+  { ...pose("idle", 0, 550), lampPhase: "depart" },
+  { ...pose("idle", 0, 600), lampPhase: "off" },
+];
+
+const sunglasses: readonly OllieFrame[] = [
+  { ...pose("idle", 0, 280), sunglassesPhase: "off" },
+  { ...pose("working", 0, 460), sunglassesPhase: "fetch" },
+  { ...pose("working", 2, 650), sunglassesPhase: "lift" },
+  { ...pose("idle", 0, 8990), sunglassesPhase: "wear" },
+  { ...pose("working", 2, 550), sunglassesPhase: "lower" },
+  { ...pose("working", 0, 420), sunglassesPhase: "stow" },
+  { ...pose("idle", 0, 650), sunglassesPhase: "off" },
+];
+
 export const REST_AFTER_MS = 30_000;
 export const REST_FOR_MS = 20_000;
 export const REACTION_COOLDOWN_MS = 750;
@@ -153,19 +197,55 @@ export function createOllieBehavior(now = Date.now()) {
   let reactionFrames: readonly OllieFrame[] = [];
   let reactionDuration = 0;
   let wakingUntil = -Infinity;
+  let wakeFinishAt = -Infinity;
   let lastClickAt = -Infinity;
+  let changingTheme = false;
+
+  function quietAt(now: number) {
+    const quietSince =
+      reactionStartedAt === undefined
+        ? idleSince
+        : reactionStartedAt + reactionDuration;
+    return quietPhase(now - quietSince);
+  }
 
   return {
+    changeTheme(theme: "light" | "dark", now: number) {
+      const quiet = quietAt(now);
+      const wake =
+        now < wakeFinishAt
+          ? remainingWake(wakingDuration - (wakeFinishAt - now))
+          : quiet.sleeping || quiet.waking
+            ? remainingWake(quiet.waking ? quiet.phase : 0)
+            : [];
+      reactionFrames = [
+        ...wake.map((frame) => ({
+          ...frame,
+          ...(theme === "dark" ? { lampPhase: "off" as const } : {}),
+        })),
+        ...(theme === "dark" ? lampPull : sunglasses),
+      ];
+      reactionDuration = duration(reactionFrames);
+      reactionStartedAt = now;
+      wakingUntil = now + reactionDuration;
+      wakeFinishAt = now + duration(wake);
+      lastClickAt = now;
+      changingTheme = true;
+    },
+    cancelThemeTransition(now: number) {
+      if (!changingTheme) return;
+      reactionStartedAt = undefined;
+      idleSince = now;
+      wakingUntil = -Infinity;
+      wakeFinishAt = -Infinity;
+      changingTheme = false;
+    },
     react(now: number) {
       // Coalesce double clicks; accepted clicks replace a reaction, never queue it.
       if (now < wakingUntil || now - lastClickAt < REACTION_COOLDOWN_MS) {
         return false;
       }
-      const quietSince =
-        reactionStartedAt === undefined
-          ? idleSince
-          : reactionStartedAt + reactionDuration;
-      const quiet = quietPhase(now - quietSince);
+      const quiet = quietAt(now);
       const needsWake = quiet.sleeping || quiet.waking;
       const wakeElapsed = quiet.waking ? quiet.phase : 0;
       lastClickAt = now;
@@ -176,7 +256,9 @@ export function createOllieBehavior(now = Date.now()) {
         : reactions[reactionIndex]!;
       reactionDuration = duration(reactionFrames);
       wakingUntil = needsWake ? now + wakingDuration - wakeElapsed : -Infinity;
+      wakeFinishAt = wakingUntil;
       reactionStartedAt = now;
+      changingTheme = false;
       return true;
     },
     sample(now: number) {
@@ -190,6 +272,8 @@ export function createOllieBehavior(now = Date.now()) {
         }
         idleSince = reactionStartedAt + reactionDuration;
         reactionStartedAt = undefined;
+        wakeFinishAt = -Infinity;
+        changingTheme = false;
       }
 
       // Wall time lets Ollie settle while the tab or header is out of sight.

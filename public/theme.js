@@ -91,6 +91,7 @@
 
   function applyTheme(theme, persist = false) {
     const root = document.documentElement;
+    const previousTheme = root.dataset.theme;
     root.classList.add("js");
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
@@ -99,6 +100,14 @@
 
     if (persist) {
       persistTheme(theme);
+    }
+
+    if (previousTheme !== theme) {
+      document.dispatchEvent(
+        new CustomEvent("theme:change", {
+          detail: { theme, previousTheme },
+        }),
+      );
     }
   }
 

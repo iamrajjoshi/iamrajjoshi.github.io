@@ -1,6 +1,8 @@
 ---
 import atlas from "~/assets/ollie/spritesheet.webp";
 import still from "~/assets/ollie/still.webp";
+import OllieLamp from "./OllieLamp.astro";
+import OllieSunglasses from "./OllieSunglasses.astro";
 ---
 
 <button
@@ -8,10 +10,13 @@ import still from "~/assets/ollie/still.webp";
   type="button"
   data-ollie-avatar
   data-atlas={atlas.src}
+  data-lamp-phase="off"
+  data-sunglasses-phase="off"
   aria-label="Ollie"
   title="Ollie"
   disabled
 >
+  <OllieLamp />
   <img
     class="ollie-still"
     src={still.src}
@@ -23,6 +28,7 @@ import still from "~/assets/ollie/still.webp";
     fetchpriority="high"
   />
   <span class="ollie-sprite" aria-hidden="true"></span>
+  <OllieSunglasses />
 </button>
 
 <script>
@@ -48,6 +54,7 @@ import still from "~/assets/ollie/still.webp";
     let loaded = false;
     let loading = false;
     let disposed = false;
+    let darkMode = document.documentElement.dataset.theme === "dark";
 
     function paint() {
       const { frame, mood, delay } = behavior.sample(Date.now());
@@ -55,6 +62,12 @@ import still from "~/assets/ollie/still.webp";
       button!.dataset.animation = frame.animation;
       button!.dataset.frame = `${frame.row}:${frame.column}`;
       button!.dataset.mood = mood;
+      button!.dataset.lampPhase =
+        darkMode && !reducedMotion.matches ? (frame.lampPhase ?? "off") : "off";
+      button!.dataset.sunglassesPhase =
+        !darkMode && !reducedMotion.matches
+          ? (frame.sunglassesPhase ?? "off")
+          : "off";
       return delay;
     }
 
@@ -87,6 +100,7 @@ import still from "~/assets/ollie/still.webp";
       const label = button!.disabled ? "Ollie" : "Say hi to Ollie";
       button!.setAttribute("aria-label", label);
       button!.title = label;
+      paint();
 
       // Reduced motion and no-JS visitors only need the small still image.
       if (!reducedMotion.matches && !loaded && !loading) {
@@ -119,9 +133,25 @@ import still from "~/assets/ollie/still.webp";
       if (!behavior.react(Date.now())) return;
       syncPlayback();
     };
+    const themeChanged = (event: Event) => {
+      const { theme } = (event as CustomEvent<{ theme: "light" | "dark" }>)
+        .detail;
+      darkMode = theme === "dark";
+      if (loaded && inViewport && !document.hidden && !reducedMotion.matches) {
+        behavior.changeTheme(theme, Date.now());
+      } else {
+        behavior.cancelThemeTransition(Date.now());
+      }
+      syncPlayback();
+    };
+    const motionChanged = () => {
+      if (reducedMotion.matches) behavior.cancelThemeTransition(Date.now());
+      syncPlayback();
+    };
     button.addEventListener("click", greetOllie);
     document.addEventListener("visibilitychange", syncPlayback);
-    reducedMotion.addEventListener("change", syncPlayback);
+    document.addEventListener("theme:change", themeChanged);
+    reducedMotion.addEventListener("change", motionChanged);
     observer.observe(button);
     paint();
     syncPlayback();
@@ -134,7 +164,8 @@ import still from "~/assets/ollie/still.webp";
       image.onerror = null;
       button.removeEventListener("click", greetOllie);
       document.removeEventListener("visibilitychange", syncPlayback);
-      reducedMotion.removeEventListener("change", syncPlayback);
+      document.removeEventListener("theme:change", themeChanged);
+      reducedMotion.removeEventListener("change", motionChanged);
     };
   }
 
@@ -167,6 +198,8 @@ import still from "~/assets/ollie/still.webp";
 
   .ollie-still,
   .ollie-sprite {
+    position: relative;
+    z-index: 1;
     display: block;
     width: 100%;
     height: 100%;

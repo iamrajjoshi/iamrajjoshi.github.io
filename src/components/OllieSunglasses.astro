@@ -1,0 +1,69 @@
+<svg
+  class="ollie-sunglasses"
+  viewBox="0 0 96 104"
+  aria-hidden="true"
+  focusable="false"
+  shape-rendering="crispEdges"
+>
+  <g class="sunglasses">
+    <path fill="#09090b" d="M23 44h6v4h-6zM73 44h7v4h-7zM46 45h10v4H46z"></path>
+    <path
+      fill="#09090b"
+      d="M27 43h21v10h-3v3H30v-3h-3zM54 43h21v10h-3v3H57v-3h-3z"></path>
+    <path
+      fill="#1c1c20"
+      d="M30 46h15v6h-3v1h-9v-1h-3zM57 46h15v6h-3v1h-9v-1h-3z"></path>
+    <path fill="#65656b" d="M32 46h5v2h-5zM59 46h5v2h-5z"></path>
+    <path fill="#353539" d="M25 44h3v3h-3zM74 44h3v3h-3z"></path>
+  </g>
+</svg>
+
+<style>
+  .ollie-sunglasses {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .sunglasses {
+    opacity: 0;
+    transform-origin: 51px 50px;
+    transform: translate(23px, 18px) rotate(-28deg) scale(0.45);
+    transition:
+      transform 380ms cubic-bezier(0.22, 0.68, 0.16, 1),
+      opacity 180ms ease;
+  }
+
+  :global([data-sunglasses-phase="fetch"]) .sunglasses,
+  :global([data-sunglasses-phase="stow"]) .sunglasses {
+    opacity: 1;
+    transform: translate(28px, 17px) rotate(-28deg) scale(0.5);
+  }
+
+  :global([data-sunglasses-phase="lift"]) .ollie-sunglasses,
+  :global([data-sunglasses-phase="wear"]) .ollie-sunglasses,
+  :global([data-sunglasses-phase="lower"]) .ollie-sunglasses {
+    z-index: 4;
+  }
+
+  :global([data-sunglasses-phase="lift"]) .sunglasses,
+  :global([data-sunglasses-phase="lower"]) .sunglasses {
+    opacity: 1;
+    transform: translate(16px, 9px) rotate(-15deg) scale(0.8);
+  }
+
+  :global([data-sunglasses-phase="wear"]) .sunglasses {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0) scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sunglasses {
+      transition: none;
+    }
+  }
+</style>
