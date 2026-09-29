@@ -476,6 +476,13 @@ a {
   font-size: var(--text-sm);
 }
 
+.prose .katex-display {
+  margin-block: 0 1rem;
+  padding-block: 0.25rem 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .prose th,
 .prose td {
   padding: 0.5rem 0.7rem;
