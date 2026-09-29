@@ -6,6 +6,9 @@ import expressiveCode from "astro-expressive-code";
 import mdx from "@astrojs/mdx";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { remarkKatexCss } from "./remark-katex-css.mjs";
 import { remarkReadingTime } from "./remark-reading-time.mjs";
 import { toString } from "mdast-util-to-string";
 
@@ -81,8 +84,16 @@ const astroExpressiveCodeOptions = {
 export default defineConfig({
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkReadingTime],
+      // Math: single `$` stays literal so prices like $0.42 are safe.
+      // Inline math: $$z = \sum_i w_i x_i$$ within a line.
+      // Display math: $$ on its own line, the equation, then $$ on its own line.
+      remarkPlugins: [
+        remarkReadingTime,
+        [remarkMath, { singleDollarTextMath: false }],
+        remarkKatexCss,
+      ],
       rehypePlugins: [
+        rehypeKatex,
         rehypeSlug,
         [
           rehypeAutolinkHeadings,
