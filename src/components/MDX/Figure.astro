@@ -1,0 +1,43 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+interface Props {
+  light: ImageMetadata;
+  dark?: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+const { light, dark, alt, caption } = Astro.props;
+
+// Figures are drawn at 2x, so half the file's width is their true size on the page.
+const size = (image: ImageMetadata) => ({
+  width: Math.round(image.width / 2),
+  height: Math.round(image.height / 2),
+});
+---
+
+<figure class="figure">
+  <Image
+    class={dark && "fig-light"}
+    src={light}
+    alt={alt}
+    {...size(light)}
+    densities={[1, 2]}
+    quality="high"
+  />
+  {
+    dark && (
+      <Image
+        class="fig-dark"
+        src={dark}
+        alt={alt}
+        {...size(dark)}
+        densities={[1, 2]}
+        quality="high"
+      />
+    )
+  }
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

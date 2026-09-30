@@ -1,5 +1,6 @@
 :root {
   --rule: rgba(40, 34, 28, 0.18);
+  --table-edge: rgba(40, 34, 28, 0.62);
   --surface: #f5ecd9;
   --code-background: #f3e9d5;
   --callout-success: #2f6f4a;
@@ -14,6 +15,7 @@
 
 :root[data-theme="dark"] {
   --rule: rgba(255, 249, 235, 0.17);
+  --table-edge: rgba(255, 249, 235, 0.55);
   --surface: #312a23;
   --code-background: #332c25;
   --callout-success: #77bc8e;
@@ -24,6 +26,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --rule: rgba(255, 249, 235, 0.17);
+    --table-edge: rgba(255, 249, 235, 0.55);
     --surface: #312a23;
     --code-background: #332c25;
     --callout-success: #77bc8e;
@@ -369,7 +372,6 @@ a {
 .prose ol,
 .prose blockquote,
 .prose figure,
-.prose table,
 .prose .expressive-code {
   margin-block: 0 1rem;
 }
@@ -468,31 +470,115 @@ a {
   background: var(--rule);
 }
 
-.prose table {
-  display: block;
-  width: 100%;
-  overflow-x: auto;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
+/* Figures drawn for the page: no frame, the column's width at most, a theme variant each. */
+.prose .figure {
+  margin-block: 2.25rem;
 }
 
-.prose .katex-display {
-  margin-block: 0 1rem;
-  padding-block: 0.25rem 0.5rem;
+.prose .figure img {
+  margin: 0 auto;
+  border: 0;
+  border-radius: 0;
+}
+
+.fig-dark {
+  display: none !important;
+}
+
+:root[data-theme="dark"] .fig-light {
+  display: none !important;
+}
+
+:root[data-theme="dark"] .fig-dark {
+  display: block !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .fig-light {
+    display: none !important;
+  }
+
+  :root:not([data-theme]) .fig-dark {
+    display: block !important;
+  }
+}
+
+.prose figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* Tables: booktabs rules, tabular figures, numbers right-aligned (see rehype-tables.mjs). */
+.table-scroll {
+  margin-block: 1.75rem 2rem;
   overflow-x: auto;
-  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: color-mix(in srgb, var(--link) 36%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.prose table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  border-block: 1.5px solid var(--table-edge);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 1.4;
 }
 
 .prose th,
 .prose td {
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--rule);
+  padding: 0.6rem 0.8rem;
   text-align: left;
+  vertical-align: baseline;
+}
+
+.prose :is(th, td):first-child {
+  padding-left: 0.1rem;
+}
+
+.prose :is(th, td):last-child {
+  padding-right: 0.1rem;
 }
 
 .prose th {
-  background: var(--surface);
+  padding-top: 0.75rem;
+  border-bottom: 1px solid var(--table-edge);
+  color: var(--text);
   font-weight: 600;
+  text-wrap: balance;
+  vertical-align: bottom;
+}
+
+.prose tbody tr + tr td {
+  border-top: 1px solid var(--rule);
+}
+
+.prose :is(th, td).num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.prose th.num {
+  white-space: normal;
+}
+
+/* Display math: room above and below, and long equations scroll inside their own box. */
+.prose .katex-display {
+  margin-block: 1.5rem 1.75rem;
+  padding-block: 0.35rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: color-mix(in srgb, var(--link) 36%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.prose .katex-display > .katex {
+  padding-inline: 0.25rem;
 }
 
 .anchor-link {

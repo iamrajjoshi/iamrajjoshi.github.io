@@ -10,6 +10,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { remarkKatexCss } from "./remark-katex-css.mjs";
 import { remarkReadingTime } from "./remark-reading-time.mjs";
+import { rehypeTables } from "./rehype-tables.mjs";
 import { toString } from "mdast-util-to-string";
 
 /** @type {import('astro-expressive-code').AstroExpressiveCodeOptions} */
@@ -94,6 +95,7 @@ export default defineConfig({
       ],
       rehypePlugins: [
         rehypeKatex,
+        rehypeTables,
         rehypeSlug,
         [
           rehypeAutolinkHeadings,
