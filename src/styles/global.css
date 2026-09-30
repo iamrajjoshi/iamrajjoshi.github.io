@@ -1022,3 +1022,17 @@ a {
     padding: 0;
   }
 }
+
+/* KaTeX sets math at 1.21em, which reads larger than the body face; 1.1em sits with the text. */
+.prose .katex {
+  font-size: 1.1em;
+}
+
+/* Wrapped code on a phone breaks mid-identifier; scroll the block sideways instead. */
+@media (max-width: 48rem) {
+  .prose .expressive-code pre.wrap .ec-line .code {
+    white-space: pre;
+    overflow-wrap: normal;
+    min-width: 0;
+  }
+}
