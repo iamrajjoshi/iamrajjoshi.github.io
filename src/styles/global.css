@@ -407,6 +407,11 @@ a {
   font-weight: 600;
 }
 
+/* Footnote markers shouldn't open a gap above their line. */
+.prose sup {
+  line-height: 0;
+}
+
 .prose a {
   color: var(--link);
   text-decoration-color: color-mix(in srgb, var(--link) 45%, transparent);
@@ -472,7 +477,7 @@ a {
 
 /* Figures drawn for the page: no frame, the column's width at most, a theme variant each. */
 .prose .figure {
-  margin-block: 2.25rem;
+  margin: 2.25rem 0;
 }
 
 .prose .figure img {
@@ -857,6 +862,7 @@ a {
 
   .anchor-link {
     position: relative;
+    right: auto;
     display: inline-block;
     width: auto;
     margin-right: 0.35rem;
@@ -932,6 +938,7 @@ a {
 
   .anchor-link {
     position: relative;
+    right: auto;
     display: inline-block;
     width: auto;
     margin-right: 0.35rem;

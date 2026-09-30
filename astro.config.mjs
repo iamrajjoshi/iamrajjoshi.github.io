@@ -15,7 +15,10 @@ import { toString } from "mdast-util-to-string";
 
 /** @type {import('astro-expressive-code').AstroExpressiveCodeOptions} */
 const astroExpressiveCodeOptions = {
-  themes: ["solarized-light", "solarized-dark"],
+  themes: ["everforest-light", "everforest-dark"],
+  // WCAG AA with rounding headroom. The dark theme clears it with its own
+  // colours; everforest-light's hues are darkened to reach it on the cream.
+  minSyntaxHighlightingColorContrast: 4.6,
   useDarkModeMediaQuery: true,
   useThemedSelectionColors: true,
   defaultProps: {
@@ -25,6 +28,16 @@ const astroExpressiveCodeOptions = {
     },
   },
   customizeTheme(theme) {
+    // everforest-light's plain text (#5c6a72) is only 4.6:1 on the cream; use the site ink.
+    if (theme.type === "light") {
+      const fg = theme.fg.toLowerCase();
+      for (const { settings } of theme.settings) {
+        if (settings.foreground?.toLowerCase() === fg) {
+          settings.foreground = "#28221c";
+        }
+      }
+      theme.fg = theme.colors["editor.foreground"] = "#28221c";
+    }
     theme.name = theme.type;
   },
   styleOverrides: {

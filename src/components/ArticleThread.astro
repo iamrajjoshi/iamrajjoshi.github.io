@@ -121,6 +121,15 @@ const headings = Astro.props.headings
         }
       });
 
+      // A long list scrolls inside its sticky box; keep the active link in view.
+      const innerBox = activeThreadInner.getBoundingClientRect();
+      const activeBox = sections[activeIndex]?.link.getBoundingClientRect();
+      if (activeBox && activeBox.bottom > innerBox.bottom) {
+        activeThreadInner.scrollTop += activeBox.bottom - innerBox.bottom;
+      } else if (activeBox && activeBox.top < innerBox.top) {
+        activeThreadInner.scrollTop -= innerBox.top - activeBox.top;
+      }
+
       const markerPosition = Math.max(
         0,
         (stitchPositions[activeIndex] ?? trackStart) - trackStart,
@@ -145,7 +154,12 @@ const headings = Astro.props.headings
       const innerBox = activeThreadInner.getBoundingClientRect();
       stitchPositions = stitches.map((stitch) => {
         const stitchBox = stitch.getBoundingClientRect();
-        return stitchBox.top + stitchBox.height / 2 - innerBox.top;
+        return (
+          stitchBox.top +
+          stitchBox.height / 2 -
+          innerBox.top +
+          activeThreadInner.scrollTop
+        );
       });
       trackStart = stitchPositions[0] ?? 0;
       const trackEnd = stitchPositions.at(-1) ?? trackStart;
