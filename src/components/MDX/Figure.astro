@@ -11,7 +11,8 @@ interface Props {
 
 const { light, dark, alt, caption } = Astro.props;
 
-// Figures are drawn at 2x, so half the file's width is their true size on the page.
+// PNG figures are drawn at 2x, so half the file's width is their true size on the page.
+// SVGs carry their page size and are served as they are, so they stay sharp when zoomed.
 const size = (image: ImageMetadata) => ({
   width: Math.round(image.width / 2),
   height: Math.round(image.height / 2),
@@ -19,24 +20,30 @@ const size = (image: ImageMetadata) => ({
 ---
 
 <figure class="figure">
-  <Image
-    class={dark && "fig-light"}
-    src={light}
-    alt={alt}
-    {...size(light)}
-    densities={[1, 2]}
-    quality="high"
-  />
   {
-    dark && (
-      <Image
-        class="fig-dark"
-        src={dark}
-        alt={alt}
-        {...size(dark)}
-        densities={[1, 2]}
-        quality="high"
-      />
+    [light, dark].map(
+      (image, i) =>
+        image &&
+        (image.format === "svg" ? (
+          <img
+            class={dark && (i ? "fig-dark" : "fig-light")}
+            src={image.src}
+            alt={alt}
+            width={image.width}
+            height={image.height}
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <Image
+            class={dark && (i ? "fig-dark" : "fig-light")}
+            src={image}
+            alt={alt}
+            {...size(image)}
+            densities={[1, 2]}
+            quality="high"
+          />
+        )),
     )
   }
   {caption && <figcaption>{caption}</figcaption>}
