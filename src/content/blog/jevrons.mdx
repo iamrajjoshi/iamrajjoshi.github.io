@@ -238,15 +238,18 @@ The input activation comes from the real forward pass, while the sigmoid slope s
 Here's the formulation in Python, from `net.py`:
 
 ```python
-acts, zs = forward(params, X, jev_neuron)   # a = Jev's p, z = w·x + b computed in code
+# a = Jev's p; z = w·x + b, computed in code
+acts, zs = forward(params, X, jev_neuron)
 p = np.clip(acts[-1], 1e-3, 1 - 1e-3)
 da = (p - Y) / (p * (1 - p)) / Y.size
 
 for layer in reversed(range(len(params))):
     s = sig(zs[layer] / tau)
-    dz = da * s * (1 - s) / tau              # slope of sigmoid(z / tau), not of Jev
+    # slope of sigmoid(z / tau), not of Jev
+    dz = da * s * (1 - s) / tau
     dW, db = acts[layer].T @ dz, dz.sum(0)
-    da = dz @ params[layer][0].T             # flows to the earlier layer through w
+    # flows to the earlier layer through w
+    da = dz @ params[layer][0].T
 ```
 
 $$\tau$$ was 1 on XOR, 0.3 on the circle and 3 on digits, where sums are larger.
