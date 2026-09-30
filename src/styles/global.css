@@ -372,8 +372,24 @@ a {
 .prose ol,
 .prose blockquote,
 .prose figure,
+.prose details,
 .prose .expressive-code {
   margin-block: 0 1rem;
+}
+
+.prose summary {
+  color: var(--link);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.prose summary:hover {
+  color: var(--link-hover);
+}
+
+.prose summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
 }
 
 .prose h2,
