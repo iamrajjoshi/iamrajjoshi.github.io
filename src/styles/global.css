@@ -483,6 +483,45 @@ a {
   overflow-y: hidden;
 }
 
+/* Images, tables and display math break out of the text column on wide screens. */
+@media (min-width: 64rem) {
+  .prose {
+    --breakout: min(60rem, 100vw - 2 * var(--page-gutter));
+  }
+
+  .prose img,
+  .prose table,
+  .prose .katex-display {
+    position: relative;
+    left: 50%;
+    max-width: var(--breakout);
+    margin-inline: 0;
+    translate: -50%;
+  }
+
+  .prose table,
+  .prose .katex-display {
+    width: fit-content;
+    min-width: 100%;
+  }
+}
+
+/* The article thread sits right of the column here, so wide blocks grow left. */
+@media (min-width: 73rem) {
+  .prose {
+    --breakout: min(
+      60rem,
+      var(--page-width) + (100vw - var(--page-width)) / 2 - var(--page-gutter)
+    );
+  }
+
+  .prose img,
+  .prose table,
+  .prose .katex-display {
+    translate: min(-50%, var(--page-width) / 2 - 100%);
+  }
+}
+
 .prose th,
 .prose td {
   padding: 0.5rem 0.7rem;
